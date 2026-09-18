@@ -4,80 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lua AI Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: #0b0e14; color: #e6edf3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* الهيدر وقائمة النماذج */
+        /* الهيدر وقائمة الموديلات */
         header { background-color: #0d1117; padding: 12px 20px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; z-index: 10; position: relative; }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .menu-btn { background: none; border: none; cursor: pointer; color: #58a6ff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; }
+        
+        .menu-btn { background: none; border: none; cursor: pointer; color: #58a6ff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; transition: background 0.2s; }
+        .menu-btn:active { background: #21262d; }
 
-        .model-selector-btn { background: #161b22; border: 1px solid #30363d; color: #e6edf3; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .model-selector-btn { background: #161b22; border: 1px solid #30363d; color: #e6edf3; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
         .model-selector-btn:hover { border-color: #58a6ff; }
         
-        .model-dropdown { position: absolute; top: 55px; left: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 220px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 200; overflow: hidden; }
-        .model-dropdown.active { display: flex; }
-        .model-option { padding: 12px 16px; cursor: pointer; display: flex; flex-direction: column; border-bottom: 1px solid #21262d; }
+        /* أنيميشن سلس لقائمة الموديلات */
+        .model-dropdown { position: absolute; top: 55px; left: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 220px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); opacity: 0; transform: translateY(-10px) scale(0.95); pointer-events: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200; overflow: hidden; }
+        .model-dropdown.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .model-option { padding: 12px 16px; cursor: pointer; display: flex; flex-direction: column; border-bottom: 1px solid #21262d; transition: background 0.15s; }
         .model-option:last-child { border-bottom: none; }
         .model-option:hover { background: #21262d; }
         .model-option-title { font-weight: 700; font-size: 0.9rem; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .model-option-desc { font-size: 0.75rem; color: #8b949e; margin-top: 2px; }
 
-        /* القائمة الجانبية */
-        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 100; display: none; }
-        .sidebar-overlay.active { display: block; }
-        .sidebar { position: fixed; top: 0; right: -380px; width: 340px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; display: flex; flex-direction: column; transition: right 0.3s ease; justify-content: space-between; }
-        .sidebar.active { right: 0; }
+        /* القائمة الجانبية بسلاسة عالية */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        .sidebar { position: fixed; top: 0; right: 0; width: 320px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; justify-content: space-between; }
+        .sidebar.active { transform: translateX(0); }
         .sidebar-header { padding: 16px 20px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #58a6ff; }
         .sidebar-close { background: #21262d; border: none; color: #c9d1d9; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .sidebar-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar-section { padding: 16px 20px; border-bottom: 1px solid #21262d; }
-        .sidebar-section h3 { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; text-transform: uppercase; }
-        .chat-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
-        .chat-item { background: #161b22; border: 1px solid #30363d; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; cursor: pointer; }
-        .chat-delete-btn { background: none; border: none; color: #8b949e; cursor: pointer; }
-        .sidebar-nav-item { background: #161b22; border: 1px solid #30363d; padding: 10px 14px; border-radius: 10px; color: #58a6ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
 
-        /* منطقة الشات */
+        /* منطقة المحادثة */
         .app-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-        .message { max-width: 85%; padding: 14px 18px; border-radius: 16px; line-height: 1.6; word-wrap: break-word; font-size: 0.95rem; }
+        .message { max-width: 90%; padding: 14px 18px; border-radius: 16px; line-height: 1.6; word-wrap: break-word; font-size: 0.95rem; }
         .user-message { background: #1f6feb; color: #fff; align-self: flex-start; border-bottom-right-radius: 4px; }
-        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; border-bottom-left-radius: 4px; width: 92%; }
+        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; border-bottom-left-radius: 4px; width: 95%; }
 
-        /* صندوق إتاحة الميديا داخل الرسائل */
-        .media-preview-box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 8px; margin-bottom: 10px; max-width: 200px; }
-        .media-preview-box img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 6px; display: block; }
-        .media-preview-box .file-tag { font-size: 0.8rem; color: #79c0ff; word-break: break-all; }
+        /* صندوق الكود الاحترافي (Code Box) */
+        .code-box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .code-header { background: #161b22; padding: 8px 14px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #8b949e; font-family: 'Fira Code', monospace; }
+        .copy-btn { background: #21262d; border: 1px solid #30363d; color: #58a6ff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: #30363d; color: #fff; }
+        .code-box pre { padding: 14px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 0.88rem; color: #e6edf3; line-height: 1.5; direction: ltr; text-align: left; }
 
-        /* شريط الدردشة البيضاوي العائم (مطابق للصورة) */
-        .chat-input-wrapper { padding: 12px 16px; background: transparent; position: relative; }
-        
-        /* معاينة الميديا المرفقة قبل الإرسال */
-        .attachment-preview-bar { display: none; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 8px 12px; margin-bottom: 8px; align-items: center; justify-content: space-between; }
-        .attachment-preview-bar.active { display: flex; }
-        .preview-info { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #79c0ff; }
-        .preview-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-        .remove-attachment-btn { background: none; border: none; color: #f85149; cursor: pointer; }
+        /* شريط المدخلات البيضاوي مع دعم كروت المرفقات (مثل الصورة) */
+        .chat-input-wrapper { padding: 12px 16px; background: transparent; }
+        .floating-input-card { background: #161b22; border: 1px solid #30363d; border-radius: 24px; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
 
-        .floating-input-bar { background: #161b22; border: 1px solid #30363d; border-radius: 30px; padding: 6px 10px 6px 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-        .plus-btn { background: none; border: none; color: #e6edf3; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .plus-btn:hover { background: #21262d; }
+        /* حاوية كروت المرفقات المرفوعة (مثل تصميم الآيفون بالصورة) */
+        .attachments-chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .attachment-chip { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; position: relative; max-width: 240px; }
+        .chip-icon { width: 36px; height: 36px; background: #21262d; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #58a6ff; flex-shrink: 0; overflow: hidden; }
+        .chip-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .chip-details { display: flex; flex-direction: column; overflow: hidden; }
+        .chip-name { font-size: 0.8rem; font-weight: 700; color: #e6edf3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; text-align: right; }
+        .chip-meta { font-size: 0.7rem; color: #8b949e; }
+        .chip-remove-btn { position: absolute; top: -6px; left: -6px; background: #30363d; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
+
+        .input-row { display: flex; align-items: center; gap: 10px; }
+        .native-plus-btn { background: #21262d; border: none; color: #e6edf3; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+        .native-plus-btn:hover { background: #30363d; }
         
-        #user-input { flex: 1; background: transparent; border: none; outline: none; color: #e6edf3; font-size: 0.95rem; resize: none; height: 24px; max-height: 100px; line-height: 24px; }
+        #user-input { flex: 1; background: transparent; border: none; outline: none; color: #e6edf3; font-size: 0.95rem; resize: none; height: 26px; max-height: 120px; line-height: 26px; }
         
-        .input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .action-btns { display: flex; align-items: center; gap: 6px; }
         .icon-btn { background: none; border: none; color: #8b949e; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .send-pill-btn { background: #1f6feb; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .send-pill-btn { background: #1f6feb; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+        .send-pill-btn:active { transform: scale(0.9); }
         .send-pill-btn svg { fill: #ffffff; width: 18px; height: 18px; }
-
-        /* قائمة الزر (+) العائمة */
-        .attach-popup-menu { position: absolute; bottom: 70px; right: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 150; overflow: hidden; }
-        .attach-popup-menu.active { display: flex; }
-        .attach-menu-item { padding: 12px 16px; font-size: 0.88rem; color: #e6edf3; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .attach-menu-item:hover { background: #21262d; color: #58a6ff; }
     </style>
 </head>
 <body>
@@ -97,11 +94,11 @@
         <div class="model-dropdown" id="modelDropdown">
             <div class="model-option" data-model="3.5-lite">
                 <div class="model-option-title">3.5 Flash-Lite <span class="check-mark"></span></div>
-                <div class="model-option-desc">أسرع الإجابات للمهام الخفيفة</div>
+                <div class="model-option-desc">أسرع الإجابات للمهام السريعة</div>
             </div>
             <div class="model-option" data-model="3.6-flash">
                 <div class="model-option-title">3.6 Flash <span class="check-mark">✓</span></div>
-                <div class="model-option-desc">مساعدة متكاملة للأكواد والتحليل</div>
+                <div class="model-option-desc">تحليل أكواد Roblox والملفات بذكاء</div>
             </div>
         </div>
     </header>
@@ -109,79 +106,44 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>القائمة والتحكم</span>
+            <span>القائمة الجانبية</span>
             <button class="sidebar-close" id="sidebarCloseBtn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="sidebar-body">
-            <div class="sidebar-section">
-                <h3>سجل المحادثات</h3>
-                <div class="chat-list" id="chatListContainer"></div>
-            </div>
-            <div class="sidebar-section">
-                <h3>الأدوات الرئيسية</h3>
-                <div class="sidebar-nav-item" id="newChatNavBtn" style="color: #3fb950;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    محادثة جديدة
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- واجهة الدردشة الرئيسية -->
+    <!-- واجهة الشات -->
     <div id="chatView" class="app-view">
         <div id="chat-container">
             <div class="message ai-message">
-                <p>مرحباً بك! أنا مساعدك الذكي لبرمجة وتحليل ألعاب Roblox. أرسل استفسارك، أو كودك، أو صورة للتحليل.</p>
+                <p>مرحباً بك! يمكنك كتابة الأكواد، أو رفع الملفات والصور مباشرة عبر زر (+) ليتم تحليلها وتصحيحها بداخل صندوق الأكواد[span_2](start_span)[span_2](end_span).</p>
             </div>
         </div>
 
         <div class="chat-input-wrapper">
-            <!-- قائمة الخيارات عند الضغط على (+) -->
-            <div class="attach-popup-menu" id="attachPopupMenu">
-                <div class="attach-menu-item" id="optCamera">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    الكاميرا
-                </div>
-                <div class="attach-menu-item" id="optPhotos">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    ألبوم الصور
-                </div>
-                <div class="attach-menu-item" id="optFiles">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                    الملفات
-                </div>
-            </div>
+            <!-- input خفي يفتح قائمة خيارات الآيفون الأصلية فوراً (كاميرا / ألبوم / ملفات) -->
+            <input type="file" id="nativeFileInput" accept="image/*,.lua,.txt,.json,.js" multiple style="display:none;">
 
-            <!-- مدخلات الملفات الخفية -->
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
-            <input type="file" id="photoInput" accept="image/*" style="display:none;">
-            <input type="file" id="fileInput" accept=".lua,.txt,.json,.js" style="display:none;">
+            <div class="floating-input-card">
+                <!-- منطقة إظهار كروت الملفات والصور المرفوعة (مثل الصورة) -->
+                <div class="attachments-chips-container" id="attachmentsChipsContainer"></div>
 
-            <!-- بار معاينة الصورة/الملف المرفق قبل الإرسال -->
-            <div class="attachment-preview-bar" id="attachmentPreviewBar">
-                <div class="preview-info" id="previewInfo"></div>
-                <button class="remove-attachment-btn" id="removeAttachmentBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-
-            <!-- شريط الكتابة البيضاوي الاحترافي -->
-            <div class="floating-input-bar">
-                <button class="plus-btn" id="plusMenuToggle">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                
-                <textarea id="user-input" placeholder="اكتب رسالتك..." rows="1"></textarea>
-                
-                <div class="input-actions">
-                    <button class="icon-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <div class="input-row">
+                    <button class="native-plus-btn" id="plusBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
-                    <button class="send-pill-btn" id="sendBtn">
-                        <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line><polyline points="5 12 12 5 19 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline></svg>
-                    </button>
+                    
+                    <textarea id="user-input" placeholder="اكتب سؤالك أو الكود..." rows="1"></textarea>
+                    
+                    <div class="action-btns">
+                        <button class="icon-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </button>
+                        <button class="send-pill-btn" id="sendBtn">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line><polyline points="5 12 12 5 19 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -189,159 +151,188 @@
 
     <script>
         let currentSelectedModel = '3.6-flash';
-        let attachedImageBase64 = null;
-        let attachedImageMime = null;
-        let attachedFileName = null;
+        let attachedFiles = []; // حفظ المرفقات
 
-        const modelSelectorBtn = document.getElementById('modelSelectorBtn');
-        const modelDropdown = document.getElementById('modelDropdown');
-        const currentModelLabel = document.getElementById('currentModelLabel');
-
-        const plusMenuToggle = document.getElementById('plusMenuToggle');
-        const attachPopupMenu = document.getElementById('attachPopupMenu');
-
-        const cameraInput = document.getElementById('cameraInput');
-        const photoInput = document.getElementById('photoInput');
-        const fileInput = document.getElementById('fileInput');
-
-        const attachmentPreviewBar = document.getElementById('attachmentPreviewBar');
-        const previewInfo = document.getElementById('previewInfo');
-        const removeAttachmentBtn = document.getElementById('removeAttachmentBtn');
-
+        const nativeFileInput = document.getElementById('nativeFileInput');
+        const plusBtn = document.getElementById('plusBtn');
+        const attachmentsChipsContainer = document.getElementById('attachmentsChipsContainer');
         const sendBtn = document.getElementById('sendBtn');
         const userInput = document.getElementById('user-input');
         const chatContainer = document.getElementById('chat-container');
 
-        // التبديل بين النماذج (3.5 و 3.6)
-        modelSelectorBtn.onclick = (e) => { e.stopPropagation(); modelDropdown.classList.toggle('active'); };
-        document.onclick = () => { modelDropdown.classList.remove('active'); attachPopupMenu.classList.remove('active'); };
+        // فتح مستعرض الآيفون الأصلي المباشر عند الضغط على (+)
+        plusBtn.onclick = () => nativeFileInput.click();
 
-        document.querySelectorAll('.model-option').forEach(opt => {
-            opt.onclick = () => {
-                currentSelectedModel = opt.getAttribute('data-model');
-                currentModelLabel.textContent = (currentSelectedModel === '3.5-lite') ? '3.5 Flash-Lite' : '3.6 Flash';
+        nativeFileInput.onchange = (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                const isImage = file.type.startsWith('image/');
+
+                reader.onload = (evt) => {
+                    const fileObj = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        type: file.type,
+                        isImage: isImage,
+                        data: evt.target.result
+                    };
+                    attachedFiles.push(fileObj);
+                    renderAttachmentChips();
+                };
+
+                if (isImage) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+            nativeFileInput.value = '';
+        };
+
+        // رسم كروت المرفقات بداخل حقل الكتابة (مثل الصورة)
+        function renderAttachmentChips() {
+            attachmentsChipsContainer.innerHTML = '';
+            attachedFiles.forEach(file => {
+                const chip = document.createElement('div');
+                chip.className = 'attachment-chip';
                 
-                document.querySelectorAll('.check-mark').forEach(c => c.textContent = '');
-                opt.querySelector('.check-mark').textContent = '✓';
-            };
-        });
+                const iconContent = file.isImage 
+                    ? `<img src="${file.data}">`
+                    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
 
-        // فتح قائمة (+) المرفقات
-        plusMenuToggle.onclick = (e) => { e.stopPropagation(); attachPopupMenu.classList.toggle('active'); };
-
-        document.getElementById('optCamera').onclick = () => cameraInput.click();
-        document.getElementById('optPhotos').onclick = () => photoInput.click();
-        document.getElementById('optFiles').onclick = () => fileInput.click();
-
-        // قراءة وتجهيز الصور
-        function handleImageSelection(file) {
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                attachedImageBase64 = e.target.result.split(',')[1];
-                attachedImageMime = file.type;
-                attachedFileName = file.name;
-
-                previewInfo.innerHTML = `
-                    <img src="${e.target.result}" class="preview-thumb">
-                    <span>${file.name}</span>
+                chip.innerHTML = `
+                    <button class="chip-remove-btn" onclick="removeAttachment(${file.id})">✕</button>
+                    <div class="chip-icon">${iconContent}</div>
+                    <div class="chip-details">
+                        <span class="chip-name">${file.name}</span>
+                        <span class="chip-meta">${file.isImage ? 'صورة' : 'ملف نصي'} • ${file.size}</span>
+                    </div>
                 `;
-                attachmentPreviewBar.classList.add('active');
-            };
-            reader.readAsDataURL(file);
+                attachmentsChipsContainer.appendChild(chip);
+            });
         }
 
-        cameraInput.onchange = (e) => handleImageSelection(e.target.files[0]);
-        photoInput.onchange = (e) => handleImageSelection(e.target.files[0]);
+        function removeAttachment(id) {
+            attachedFiles = attachedFiles.filter(f => f.id !== id);
+            renderAttachmentChips();
+        }
 
-        // قراءة الملفات النصية البرمجية
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                userInput.value += `\n[محتوى ملف ${file.name}]:\n` + evt.target.result;
-                previewInfo.innerHTML = `<span>تم إرفاق الملف: ${file.name}</span>`;
-                attachmentPreviewBar.classList.add('active');
-            };
-            reader.readAsText(file);
-        };
+        // تنسيق إجابة الذكاء الاصطناعي وإنشاء صناديق الأكواد (Code Box)
+        function formatAiResponse(text) {
+            // تحويل الأكواد المحاطة بـ ``` إلى Code Box احترافي
+            const codeBlockRegex = /```(?:([a-zA-Z0-9]+)?\n)?([\s\S]*?)```/g;
+            return text.replace(codeBlockRegex, (match, lang, code) => {
+                const language = lang || 'lua';
+                return `
+                    <div class="code-box">
+                        <div class="code-header">
+                            <span>${language.toUpperCase()}</span>
+                            <button class="copy-btn" onclick="copyCode(this)">نسخ الكود</button>
+                        </div>
+                        <pre><code>${escapeHtml(code.trim())}</code></pre>
+                    </div>
+                `;
+            }).replace(/\n/g, '<br>');
+        }
 
-        removeAttachmentBtn.onclick = () => {
-            attachedImageBase64 = null;
-            attachedImageMime = null;
-            attachedFileName = null;
-            attachmentPreviewBar.classList.remove('active');
-        };
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function copyCode(btn) {
+            const code = btn.parentElement.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code);
+            btn.textContent = 'تم النسخ!';
+            setTimeout(() => btn.textContent = 'نسخ الكود', 2000);
+        }
 
         // إرسال الرسالة
         sendBtn.onclick = async () => {
             const text = userInput.value.trim();
-            if (!text && !attachedImageBase64) return;
+            if (!text && attachedFiles.length === 0) return;
 
-            // بناء رسالة المستخدم بالواجهة
+            let compiledMessage = text;
+            let imageData = null;
+
+            // بناء المرفقات وتجميع الأكواد من الملفات النصية
+            attachedFiles.forEach(f => {
+                if (f.isImage) {
+                    imageData = { data: f.data.split(',')[1], mimeType: f.type };
+                } else {
+                    compiledMessage += `\n\n[محتوى ملف ${f.name}]:\n\`\`\`lua\n${f.data}\n\`\`\``;
+                }
+            });
+
+            // إظهار رسالة المستخدم بالواجهة
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'message user-message';
-            
-            if (attachedImageBase64) {
-                userMsgDiv.innerHTML += `
-                    <div class="media-preview-box">
-                        <img src="data:${attachedImageMime};base64,${attachedImageBase64}">
-                    </div>
-                `;
+            if (attachedFiles.length > 0) {
+                let chipsHtml = '<div class="attachments-chips-container" style="margin-bottom:8px;">';
+                attachedFiles.forEach(f => {
+                    chipsHtml += `
+                        <div class="attachment-chip">
+                            <div class="chip-details"><span class="chip-name">${f.name}</span></div>
+                        </div>`;
+                });
+                chipsHtml += '</div>';
+                userMsgDiv.innerHTML = chipsHtml;
             }
-            if (text) {
-                userMsgDiv.innerHTML += `<p>${text}</p>`;
-            }
+            if (text) userMsgDiv.innerHTML += `<p>${text}</p>`;
             chatContainer.appendChild(userMsgDiv);
 
-            // تحديد رسالة الانتظار بحسب المحتوى
+            // رسالة الانتظار
             const aiMsgDiv = document.createElement('div');
             aiMsgDiv.className = 'message ai-message';
-            
-            if (attachedImageBase64) {
-                aiMsgDiv.textContent = "جاري تحليل الصورة بالذكاء الاصطناعي...";
-            } else if (text.includes("[محتوى ملف")) {
-                aiMsgDiv.textContent = "جاري تحليل الملف الأكواد البرمجية...";
-            } else {
-                aiMsgDiv.textContent = "جاري المعالجة والتحليل...";
-            }
+            aiMsgDiv.innerHTML = 'جاري تحليل الأكواد والملفات...';
             chatContainer.appendChild(aiMsgDiv);
 
-            // تجهيز البيانات للإرسال
-            const payload = {
-                message: text,
-                model: currentSelectedModel,
-                image: attachedImageBase64 ? { data: attachedImageBase64, mimeType: attachedImageMime } : null
-            };
-
-            // تفريغ المدخلات
             userInput.value = '';
-            removeAttachmentBtn.click();
+            attachedFiles = [];
+            renderAttachmentChips();
 
             try {
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        message: compiledMessage,
+                        model: currentSelectedModel,
+                        image: imageData
+                    })
                 });
                 const data = await res.json();
                 
                 if (data.success) {
-                    aiMsgDiv.textContent = data.reply;
+                    aiMsgDiv.innerHTML = formatAiResponse(data.reply);
                 } else {
                     aiMsgDiv.textContent = "خطأ: " + data.error;
                 }
             } catch (err) {
-                aiMsgDiv.textContent = "حدث خطأ أثناء الاتصال بالسيرفر.";
+                aiMsgDiv.textContent = "حدث خطأ أثناء الاتصال بالخادم.";
             }
         };
 
-        // تحكم القائمة الجانبية
+        // التحكم بالنوافذ والقوائم
+        const modelSelectorBtn = document.getElementById('modelSelectorBtn');
+        const modelDropdown = document.getElementById('modelDropdown');
         const menuToggleBtn = document.getElementById('menuToggleBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+        modelSelectorBtn.onclick = (e) => { e.stopPropagation(); modelDropdown.classList.toggle('active'); };
+        document.onclick = () => modelDropdown.classList.remove('active');
+
+        document.querySelectorAll('.model-option').forEach(opt => {
+            opt.onclick = () => {
+                currentSelectedModel = opt.getAttribute('data-model');
+                document.getElementById('currentModelLabel').textContent = (currentSelectedModel === '3.5-lite') ? '3.5 Flash-Lite' : '3.6 Flash';
+                document.querySelectorAll('.check-mark').forEach(c => c.textContent = '');
+                opt.querySelector('.check-mark').textContent = '✓';
+            };
+        });
 
         menuToggleBtn.onclick = () => { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); };
         sidebarCloseBtn.onclick = () => { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); };
