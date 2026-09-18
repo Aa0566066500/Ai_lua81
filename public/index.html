@@ -22,7 +22,6 @@
             overflow: hidden;
         }
 
-        /* أنيميشن الضغط العام للأزرار والعناصر */
         button, .chat-item, .file-drop-box, .sidebar-nav-item {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -207,7 +206,6 @@
             background: #21262d;
         }
 
-        /* الحاويات الرئيسية (التبديل بين الدردشة والمحرر) */
         .app-view {
             flex: 1;
             display: flex;
@@ -313,7 +311,6 @@
             white-space: pre;
         }
 
-        /* واجهة محرر الأكواد المستقلة (Editor View) */
         .editor-workspace {
             flex: 1;
             padding: 24px;
@@ -395,7 +392,6 @@
             box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
         }
 
-        /* صندوق الأخطاء الكبير مع أنيميشن الكتابة والتمرير الذكي */
         .large-output-box {
             background: #0d1117;
             border: 1px solid #30363d;
@@ -507,13 +503,18 @@
 
         <div class="sidebar-section">
             <h3>الأدوات الرئيسية</h3>
-            <div class="sidebar-nav-item" id="openEditorNavBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                محرر الأكواد وفحص الأخطاء
-            </div>
+            <!-- الترتيب المطلوب: الدردشات أولاً، محرر كود ثانياً، مصحح الكود ثالثاً -->
             <div class="sidebar-nav-item" id="openChatNavBtn" style="color: #3fb950;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                نافذة الدردشة الذكية
+                الدردشات
+            </div>
+            <div class="sidebar-nav-item" id="openEditorNavBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                محرر كود
+            </div>
+            <div class="sidebar-nav-item" id="openCorrectorNavBtn" style="color: #f85149;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                مصحح الكود
             </div>
         </div>
 
@@ -527,7 +528,7 @@
     <div id="chatView" class="app-view">
         <div id="chat-container">
             <div class="message ai-message">
-                <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. افتح القائمة الجانبية أو انتقل لمحرر الأكواد من القائمة بالاعلى.</p>
+                <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. افتح القائمة الجانبية للتنقل بين الدردشات، محرر الكود، ومصحح الكود.</p>
             </div>
         </div>
 
@@ -542,24 +543,34 @@
         </div>
     </div>
 
-    <!-- نافذة محرر الأكواد والفحص المستقلة -->
+    <!-- واجهة محرر كود المستقلة -->
     <div id="editorView" class="app-view hidden-view">
+        <div class="editor-workspace">
+            <div class="editor-card" style="flex: 1;">
+                <label>محرر الأكواد البرمجية (Luau)</label>
+                <textarea id="mainCodeEditorArea" style="height: 350px;" placeholder="اكتب أو الصق الكود هنا للتعديل والعمل عليه..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- واجهة مصحح الكود المستقلة (الفحص والتشريح الحقيقي بالذكاء الاصطناعي) -->
+    <div id="correctorView" class="app-view hidden-view">
         <div class="editor-workspace">
             <div class="editor-container-grid">
                 <div class="editor-card">
-                    <label>اكتب الكود للتحليل والفحص الشامل</label>
-                    <textarea id="editorCodeInput" placeholder="الصق كود Luau هنا..."></textarea>
-                    <input type="file" id="editorFileInput" style="display: none;" accept=".lua,.txt">
-                    <div class="file-drop-box" id="editorFileDropTrigger">
+                    <label>الكود المراد فحصـه وتصحيحه</label>
+                    <textarea id="correctorCodeInput" placeholder="الصق كود Luau هنا..."></textarea>
+                    <input type="file" id="correctorFileInput" style="display: none;" accept=".lua,.txt">
+                    <div class="file-drop-box" id="correctorFileDropTrigger">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        أو رفـع ملف كود (.lua / .txt)
+                        أو رفع ملف كود (.lua / .txt)
                     </div>
-                    <button class="action-main-btn" id="runEditorCheckBtn">فحص وتحليل الأخطاء الآن</button>
+                    <button class="action-main-btn" id="runRealCorrectorBtn">فحص وتحليل الأخطاء بالذكاء الاصطناعي</button>
                 </div>
                 <div class="editor-card">
-                    <label>تقرير الأخطاء والنتائج (مع كتابة تلقائية)</label>
-                    <div class="large-output-box" id="editorOutputBox">
-                        <span style="color: #8b949e; direction: rtl; display: block; text-align: right;">في انتظار إدخال الكود لبدء الفحص والتحليل...</span>
+                    <label>تقرير التحليل والتصحيح الحقيقي</label>
+                    <div class="large-output-box" id="correctorOutputBox">
+                        <span style="color: #8b949e;">في انتظار إدخال الكود لبدء الفحص العميق وتحليل الأخطاء...</span>
                     </div>
                 </div>
             </div>
@@ -592,22 +603,23 @@
 
         const chatView = document.getElementById('chatView');
         const editorView = document.getElementById('editorView');
-        const openEditorNavBtn = document.getElementById('openEditorNavBtn');
+        const correctorView = document.getElementById('correctorView');
+
         const openChatNavBtn = document.getElementById('openChatNavBtn');
+        const openEditorNavBtn = document.getElementById('openEditorNavBtn');
+        const openCorrectorNavBtn = document.getElementById('openCorrectorNavBtn');
         const headerTitle = document.getElementById('headerTitle');
 
-        const editorCodeInput = document.getElementById('editorCodeInput');
-        const editorFileInput = document.getElementById('editorFileInput');
-        const editorFileDropTrigger = document.getElementById('editorFileDropTrigger');
-        const runEditorCheckBtn = document.getElementById('runEditorCheckBtn');
-        const editorOutputBox = document.getElementById('editorOutputBox');
+        const correctorCodeInput = document.getElementById('correctorCodeInput');
+        const correctorFileInput = document.getElementById('correctorFileInput');
+        const correctorFileDropTrigger = document.getElementById('correctorFileDropTrigger');
+        const runRealCorrectorBtn = document.getElementById('runRealCorrectorBtn');
+        const correctorOutputBox = document.getElementById('correctorOutputBox');
         const chatListContainer = document.getElementById('chatListContainer');
 
         let currentAttachment = null;
-        let editorAttachedFile = null;
-        let chats = JSON.parse(localStorage.getItem('lua_chats_v2') || '[]');
+        let chats = JSON.parse(localStorage.getItem('lua_chats_v3') || '[]');
 
-        // نظام التمرير الذكي للدردشة والمخرجات
         let userScrolledUpChat = false;
         let userScrolledUpOutput = false;
 
@@ -617,10 +629,10 @@
             userScrolledUpChat = (chatContainer.scrollHeight - pos > threshold);
         });
 
-        editorOutputBox.addEventListener('scroll', () => {
+        correctorOutputBox.addEventListener('scroll', () => {
             const threshold = 60;
-            const pos = editorOutputBox.scrollTop + editorOutputBox.clientHeight;
-            userScrolledUpOutput = (editorOutputBox.scrollHeight - pos > threshold);
+            const pos = correctorOutputBox.scrollTop + correctorOutputBox.clientHeight;
+            userScrolledUpOutput = (correctorOutputBox.scrollHeight - pos > threshold);
         });
 
         function scrollToBottomChat(force = false) {
@@ -631,7 +643,7 @@
 
         function scrollToBottomOutput() {
             if (!userScrolledUpOutput) {
-                editorOutputBox.scrollTop = editorOutputBox.scrollHeight;
+                correctorOutputBox.scrollTop = correctorOutputBox.scrollHeight;
             }
         }
 
@@ -648,23 +660,33 @@
         sidebarCloseBtn.onclick = closeSidebar;
         sidebarOverlay.onclick = closeSidebar;
 
-        // التبديل بين الواجهات وإغلاق القائمة تلقائياً
-        openEditorNavBtn.onclick = () => {
-            closeSidebar();
-            chatView.classList.add('hidden-view');
-            editorView.classList.remove('hidden-view');
-            headerTitle.textContent = "Lua AI Pro - مححر وفاحص الأكواد";
-        };
-
+        // التنقل بين الواجهات وإغلاق القائمة تلقائياً
         openChatNavBtn.onclick = () => {
             closeSidebar();
             editorView.classList.add('hidden-view');
+            correctorView.classList.add('hidden-view');
             chatView.classList.remove('hidden-view');
-            headerTitle.textContent = "Lua AI Pro - الدردشة الذكية";
+            headerTitle.textContent = "Lua AI Pro - الدردشات";
+        };
+
+        openEditorNavBtn.onclick = () => {
+            closeSidebar();
+            chatView.classList.add('hidden-view');
+            correctorView.classList.add('hidden-view');
+            editorView.classList.remove('hidden-view');
+            headerTitle.textContent = "Lua AI Pro - محرر كود";
+        };
+
+        openCorrectorNavBtn.onclick = () => {
+            closeSidebar();
+            chatView.classList.add('hidden-view');
+            editorView.classList.add('hidden-view');
+            correctorView.classList.remove('hidden-view');
+            headerTitle.textContent = "Lua AI Pro - مصحح الكود";
         };
 
         function saveChatsToStorage() {
-            localStorage.setItem('lua_chats_v2', JSON.stringify(chats));
+            localStorage.setItem('lua_chats_v3', JSON.stringify(chats));
         }
 
         function renderChatList() {
@@ -676,7 +698,6 @@
             chats.forEach((chat, idx) => {
                 const div = document.createElement('div');
                 div.className = 'chat-item';
-                // تنسيق اسم الدردشة مع الرمز المطلوب واختصاره
                 const formattedTitle = `| ${chat.title.substring(0, 22)}`;
                 div.innerHTML = `
                     <span>${formattedTitle}</span>
@@ -687,9 +708,7 @@
                     </div>
                 `;
                 div.onclick = () => {
-                    closeSidebar();
                     openChatNavBtn.onclick();
-                    // تحميل المحادثة
                 };
                 chatListContainer.appendChild(div);
             });
@@ -707,54 +726,59 @@
             saveChatsToStorage();
         }
 
-        // إدارة رفع الملفات للمحرر
-        editorFileDropTrigger.onclick = () => editorFileInput.click();
-        editorFileInput.onchange = (e) => {
+        correctorFileDropTrigger.onclick = () => correctorFileInput.click();
+        correctorFileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    editorAttachedFile = { name: file.name, content: event.target.result };
-                    editorCodeInput.value = event.target.result;
-                    editorFileDropTrigger.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم رفع: ${file.name}`;
+                    correctorCodeInput.value = event.target.result;
+                    correctorFileDropTrigger.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم رفع: ${file.name}`;
                 };
                 reader.readAsText(file);
             }
         };
 
-        // محاكاة الفحص مع أنيميشن الكتابة في المربع الكبير
-        runEditorCheckBtn.onclick = async () => {
-            const code = editorCodeInput.value.trim();
+        // محرك الفحص الحقيقي بالذكاء الاصطناعي (مصحح الكود)
+        runRealCorrectorBtn.onclick = async () => {
+            const code = correctorCodeInput.value.trim();
             if (!code) {
-                editorOutputBox.innerHTML = '<span style="color:#f85149;">الرجاء كتابة أو لصق كود للفحص.</span>';
+                correctorOutputBox.innerHTML = '<span style="color:#f85149;">الرجاء كتابة أو لصق كود للفحص والتصحيح.</span>';
                 return;
             }
 
-            editorOutputBox.innerHTML = '';
-            userScrolledUpOutput = false; // إعادة ضبط التمرير للبداية
-            
-            let analysisResult = "=== بدء تحليل كود Luau ===\n";
-            if (code.includes('BackgrundColor3')) {
-                analysisResult += "[خطأ فادح]: تم رصد 'BackgrundColor3' والصواب هو 'BackgroundColor3'\n";
-            } else {
-                analysisResult += "[فحص الخصائص]: سليمة ولا توجد أخطاء إملائية أساسية.\n";
-            }
-            if (code.includes('MouseButton1Clic')) {
-                analysisResult += "[خطأ حدث]: تم رصد 'MouseButton1Clic' والصواب هو 'MouseButton1Click'\n";
-            } else {
-                analysisResult += "[فحص الأحداث]: الأحداث مرتبطة بشكل صحيح.\n";
-            }
-            analysisResult += "=== اكتمل فحص الكود بنجاح ===";
+            correctorOutputBox.innerHTML = '';
+            userScrolledUpOutput = false;
+            correctorOutputBox.textContent = "جاري الاتصال بمحرك الذكاء الاصطناعي لفحص وتشريح الكود بدقة تامة...\n\n";
+            scrollToBottomOutput();
 
-            // تطبيق أنيميشن الكتابة الحرفية داخل المربع مع التمرير الذكي
-            for (let i = 0; i < analysisResult.length; i++) {
-                editorOutputBox.textContent += analysisResult[i];
-                scrollToBottomOutput();
-                await new Promise(r => setTimeout(r, 12));
+            try {
+                const promptText = `أنت خبير فحص أخطاء وهندسة برمجيات في Roblox و Luau. قم بتحليل وفحص هذا الكود سطر بستر بدقة تامة، واكشف الأخطاء الإملائية، الثغرات الأمنية، والمشاكل البرمجية، ثم أعطني التقرير مفصلاً يليه الكود المصحح بالكامل:\n\n\`\`\`lua\n${code}\n\`\`\``;
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: promptText })
+                });
+                const data = await response.json();
+
+                correctorOutputBox.innerHTML = '';
+
+                if (data.success) {
+                    const resultText = data.reply;
+                    for (let i = 0; i < resultText.length; i++) {
+                        correctorOutputBox.textContent += resultText[i];
+                        scrollToBottomOutput();
+                        await new Promise(r => setTimeout(r, 3));
+                    }
+                } else {
+                    correctorOutputBox.textContent = "خطأ أثناء التحليل: " + (data.error || "تعذر فحص الكود.");
+                }
+            } catch (err) {
+                correctorOutputBox.textContent = "خطأ في الاتصال بالخادم. تأكد من عمل السيرفر.";
             }
         };
 
-        // إدارة المرفقات والرسائل في الدردشة
         userInput.addEventListener('input', () => {
             const val = userInput.value;
             if (val.length > 90 || (val.includes('\n') && (val.includes('local') || val.includes('function')))) {
@@ -823,7 +847,6 @@
             userScrolledUpChat = false;
             appendUserMessage(messageToSend);
             
-            // إنشاء عنصر التحميل الديناميكي المتغير الحالات
             const loadingId = 'loading-' + Date.now();
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
@@ -832,7 +855,6 @@
             chatContainer.appendChild(msgDiv);
             scrollToBottomChat(true);
 
-            // تغيير حالات التحميل ديناميكياً أثناء الانتظار
             const states = ['تنفيذ الطلب...', 'كتابة السكربت...', 'إنشاء السكربت بدقة...', 'إضافة اللمسة الأخيرة...'];
             let sIdx = 0;
             const stateInterval = setInterval(() => {
