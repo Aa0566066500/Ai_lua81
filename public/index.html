@@ -6,64 +6,70 @@
     <title>مساعد Roblox Studio الذكي</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #0d1117; color: #c9d1d9; height: 100vh; display: flex; overflow: hidden; }
+        body { background-color: #f4f6f9; color: #24292e; height: 100vh; display: flex; overflow: hidden; }
 
-        /* القائمة الجانبية */
-        .sidebar { width: 260px; background: #161b22; border-left: 1px solid #30363d; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
-        .sidebar-header { padding: 15px; border-bottom: 1px solid #30363d; font-weight: bold; color: #58a6ff; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        /* القائمة الجانبية (الثيم الأبيض النقي) */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 900; }
+        .sidebar { width: 280px; background: #ffffff; border-left: 1px solid #d0d7de; display: flex; flex-direction: column; height: 100%; z-index: 1000; transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.05); }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid #d0d7de; font-weight: bold; color: #0969da; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .sidebar-content label { font-size: 12px; color: #8ab4f8; margin-bottom: 3px; }
-        .sidebar-content input, .sidebar-content textarea { width: 100%; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; }
+        .sidebar-content label { font-size: 12px; color: #0969da; font-weight: bold; }
+        .sidebar-content input, .sidebar-content textarea { width: 100%; background: #f6f8fa; border: 1px solid #d0d7de; color: #24292e; padding: 8px; border-radius: 6px; font-size: 12px; }
         
-        .new-chat-btn { background: #238636; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; }
-        .new-chat-btn:hover { background: #2ea043; }
+        .new-chat-btn { background: #1f883d; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; }
+        .new-chat-btn:hover { background: #1a7f37; }
 
         /* منطقة الدردشة الرئيسية */
-        .main-chat-area { flex: 1; display: flex; flex-direction: column; background: #0d1117; height: 100vh; position: relative; }
+        .main-chat-area { flex: 1; display: flex; flex-direction: column; background: #f4f6f9; height: 100vh; position: relative; min-width: 0; }
         
-        .chat-header { background: #161b22; padding: 12px 15px; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; }
-        .chat-header h2 { font-size: 15px; color: #58a6ff; }
-        .menu-toggle { background: none; border: none; color: #c9d1d9; font-size: 20px; cursor: pointer; display: none; }
+        .chat-header { background: #ffffff; padding: 12px 15px; border-bottom: 1px solid #d0d7de; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .chat-header h2 { font-size: 15px; color: #0969da; }
+        .menu-toggle { background: none; border: none; color: #24292e; font-size: 20px; cursor: pointer; }
 
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5; word-break: break-word; }
-        .user-message { background: #1f6feb; color: white; align-self: flex-start; }
-        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; white-space: pre-wrap; font-family: monospace; }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .user-message { background: #0969da; color: white; align-self: flex-start; }
+        .ai-message { background: #ffffff; border: 1px solid #d0d7de; color: #24292e; align-self: flex-end; white-space: pre-wrap; font-family: monospace; }
 
-        /* شريط الإدخال السفلي */
-        .chat-input-area { background: #161b22; padding: 12px; border-top: 1px solid #30363d; display: flex; flex-direction: column; gap: 8px; }
-        .file-preview-bar { display: flex; align-items: center; justify-content: space-between; background: #21262d; padding: 5px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #30363d; display: none; }
-        .file-preview-bar span { color: #7ee787; }
-        .remove-file { background: none; border: none; color: #f85149; font-weight: bold; cursor: pointer; font-size: 14px; }
+        /* شريط الإدخال السفلي النظيف والاحترافي */
+        .chat-input-area { background: #ffffff; padding: 12px; border-top: 1px solid #d0d7de; display: flex; flex-direction: column; gap: 8px; }
+        .file-preview-bar { display: none; align-items: center; justify-content: space-between; background: #f6f8fa; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: 1px solid #0969da; }
+        .file-preview-bar span { color: #0969da; font-weight: bold; }
+        .remove-file { background: none; border: none; color: #cf222e; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-        .input-row { display: flex; gap: 8px; align-items: center; }
-        .input-row textarea { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px 12px; border-radius: 6px; resize: none; height: 40px; font-size: 13px; font-family: Tahoma, sans-serif; }
-        .icon-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .icon-btn:hover { background: #30363d; }
-        .send-btn { background: #238636; color: white; border: none; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .send-btn:hover { background: #2ea043; }
+        .input-box-container { display: flex; align-items: center; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 10px; padding: 8px 12px; gap: 10px; }
+        .input-box-container:focus-within { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,0.1); }
+        .input-box-container textarea { flex: 1; background: transparent; border: none; color: #24292e; resize: none; height: 24px; max-height: 100px; font-size: 13px; font-family: Tahoma, sans-serif; outline: none; }
+        
+        .action-icon-btn { background: transparent; border: none; color: #0969da; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; font-weight: bold; }
+        .action-icon-btn:hover { color: #0550ae; }
+        .send-icon-btn { background: #1f883d; border: none; color: white; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        .send-icon-btn:hover { background: #1a7f37; }
 
-        /* للشاشات الصغيرة */
+        /* التجاوب مع الشاشات الصغيرة */
         @media (max-width: 768px) {
-            .sidebar { position: absolute; height: 100%; right: -260px; }
-            .sidebar.active { right: 0; }
-            .menu-toggle { display: block; }
+            .sidebar { position: fixed; top: 0; right: -280px; height: 100%; transition: right 0.3s ease; }
+            .sidebar.open { right: 0; }
+            .sidebar-overlay.open { display: block; }
         }
     </style>
 </head>
 <body>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- القائمة الجانبية -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>الإعدادات والتحكم</span>
+            <button onclick="toggleSidebar()" style="background:none; border:none; color:#24292e; font-size:16px; cursor:pointer;">✕</button>
         </div>
         <div class="sidebar-content">
             <button class="new-chat-btn" onclick="clearChat()">+ محادثة جديدة</button>
             <br>
             <label for="systemInstructionInput">تعليمات النظام (System Instruction):</label>
-            <textarea id="systemInstructionInput" rows="4" placeholder="مثلاً: أنت خبير في برمجة Roblox Lua وتطوير الألعاب...">أنت مساعد ذكي ومحترف في لغة Lua وتطوير ألعاب Roblox Studio.</textarea>
+            <textarea id="systemInstructionInput" rows="5" placeholder="أنت خبير في برمجة Roblox Lua...">أنت مساعد ذكي ومحترف في لغة Lua وتطوير ألعاب Roblox Studio.</textarea>
         </div>
     </div>
 
@@ -76,7 +82,7 @@
         </div>
 
         <div class="chat-messages" id="chatMessages">
-            <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد ورشات Roblox Studio ومراجعتها. كيف يمكنني مساعدتك اليوم؟</div>
+            <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد وبرمجيات Roblox Studio. كيف يمكنني مساعدتك اليوم؟</div>
         </div>
 
         <div class="chat-input-area">
@@ -84,11 +90,11 @@
                 <span id="fileName"></span>
                 <button class="remove-file" onclick="removeFile()">✕</button>
             </div>
-            <div class="input-row">
+            <div class="input-box-container">
                 <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect()">
-                <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="إرفاق ملف">📁</button>
-                <textarea id="messageInput" placeholder="اكتب سؤالك أو الكود هنا..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
-                <button class="send-btn" onclick="sendMessage()">➤</button>
+                <button class="action-icon-btn" onclick="document.getElementById('fileInput').click()" title="إرفاق ملف (+)">➕</button>
+                <textarea id="messageInput" placeholder="اكتب رسالتك أو الصق الكود هنا..." rows="1" oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
+                <button class="send-icon-btn" onclick="sendMessage()" title="إرسال">➤</button>
             </div>
         </div>
     </div>
@@ -97,7 +103,10 @@
         let attachedFile = null;
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
         }
 
         function handleFileSelect() {
@@ -126,9 +135,15 @@
 
         function clearChat() {
             document.getElementById('chatMessages').innerHTML = `
-                <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد ورشات Roblox Studio ومراجعتها. كيف يمكنني مساعدتك اليوم؟</div>
+                <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد وبرمجيات Roblox Studio. كيف يمكنني مساعدتك اليوم؟</div>
             `;
             removeFile();
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = '24px';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
         }
 
         function handleKeyDown(event) {
@@ -147,7 +162,6 @@
 
             const chatMessages = document.getElementById('chatMessages');
 
-            // عرض رسالة المستخدم
             let userDisplay = message;
             if (attachedFile) {
                 userDisplay += `\n[ملف مرفق: ${attachedFile.name}]`;
@@ -159,11 +173,11 @@
             chatMessages.appendChild(userDiv);
 
             inputEl.value = '';
+            inputEl.style.height = '24px';
             const currentFile = attachedFile;
             removeFile();
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // إضافة رسالة "جاري الكتابة..."
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message ai-message';
             loadingDiv.innerText = 'جاري المعالجة...';
