@@ -10,9 +10,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message, model, image, systemInstruction } = req.body;
+        const { message, image, systemInstruction } = req.body;
         
-        // الالتزام التام بالموديلات 3.5 و 3.6 فقط بدون أي موديلات أخرى
+        // الالتزام التام بالموديلات 3.5 و 3.6 فقط
         let modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash'];
 
         let responseText = null;
