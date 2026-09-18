@@ -67,7 +67,6 @@
             border: 1px solid rgba(88, 166, 255, 0.3);
         }
 
-        /* القائمة الجانبية اليمين والغبش الأسود */
         .sidebar-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -172,8 +171,10 @@
             border: none;
             color: #8b949e;
             cursor: pointer;
-            font-size: 0.8rem;
-            padding: 2px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
             border-radius: 4px;
         }
         .chat-action-btn:hover {
@@ -223,11 +224,15 @@
             background: #161b22;
             border: 1px dashed #30363d;
             border-radius: 8px;
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #8b949e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             transition: border-color 0.2s;
         }
         .file-drop-box:hover {
@@ -465,7 +470,6 @@
         <span class="header-badge">Roblox Expert</span>
     </header>
 
-    <!-- القائمة الجانبية -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -473,13 +477,11 @@
             <button class="sidebar-close" id="sidebarCloseBtn">✕</button>
         </div>
 
-        <!-- قسم محادثاتك -->
         <div class="sidebar-section">
             <h3>محادثاتك</h3>
             <div class="chat-list" id="chatListContainer"></div>
         </div>
 
-        <!-- قسم الأكواد القديم -->
         <div class="sidebar-section">
             <h3>الأكواد</h3>
             <div class="code-tool-container">
@@ -491,7 +493,10 @@
                     </div>
                     <div class="code-tool-box" style="justify-content: center; align-items: center;">
                         <input type="file" id="sidebarFileInput" style="display: none;" accept=".lua,.txt">
-                        <div class="file-drop-box" id="fileDropTrigger" style="width: 100%;">📁 رفع ملف</div>
+                        <div class="file-drop-box" id="fileDropTrigger" style="width: 100%;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            رفع ملف
+                        </div>
                     </div>
                 </div>
                 <button class="edit-btn-sidebar" id="sidebarEditBtn">تحرير وفحص الأخطاء</button>
@@ -502,7 +507,6 @@
             </div>
         </div>
 
-        <!-- قسم تصحيح الكود الجديد -->
         <div class="sidebar-section">
             <h3>تصحيح الكود</h3>
             <div class="code-tool-container">
@@ -514,7 +518,10 @@
                     </div>
                     <div class="code-tool-box" style="justify-content: center; align-items: center;">
                         <input type="file" id="correctionFileInput" style="display: none;" accept=".lua,.txt">
-                        <div class="file-drop-box" id="correctionFileDropTrigger" style="width: 100%;">📁 رفع ملف</div>
+                        <div class="file-drop-box" id="correctionFileDropTrigger" style="width: 100%;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            رفع ملف
+                        </div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -573,7 +580,6 @@
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 
-        // أدوات تحرير الأكواد القديمة
         const sidebarCodeInput = document.getElementById('sidebarCodeInput');
         const sidebarFileInput = document.getElementById('sidebarFileInput');
         const fileDropTrigger = document.getElementById('fileDropTrigger');
@@ -582,7 +588,6 @@
         const codeErrorsBox = document.getElementById('codeErrorsBox');
         const chatListContainer = document.getElementById('chatListContainer');
 
-        // أدوات تصحيح الكود الجديدة
         const correctionCodeInput = document.getElementById('correctionCodeInput');
         const correctionFileInput = document.getElementById('correctionFileInput');
         const correctionFileDropTrigger = document.getElementById('correctionFileDropTrigger');
@@ -597,6 +602,26 @@
         let correctionAttachedFile = null;
         let latestCorrectedCode = '';
         let chats = JSON.parse(localStorage.getItem('lua_chats') || '[]');
+
+        // نظام التحكم بالتمرير التلقائي الذكي
+        let userScrolledUp = false;
+
+        chatContainer.addEventListener('scroll', () => {
+            const threshold = 60;
+            const position = chatContainer.scrollTop + chatContainer.clientHeight;
+            const height = chatContainer.scrollHeight;
+            if (height - position > threshold) {
+                userScrolledUp = true; // المستخدم رفع الشاشة للأعلى للقراءة
+            } else {
+                userScrolledUp = false; // المستخدم في قاع الشاشة
+            }
+        });
+
+        function scrollToBottom(force = false) {
+            if (!userScrolledUp || force) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
 
         menuToggleBtn.onclick = () => {
             sidebar.classList.add('active');
@@ -626,9 +651,15 @@
                 div.innerHTML = `
                     <input type="text" value="${chat.title}" id="chat-title-${idx}" readonly />
                     <div class="chat-actions">
-                        <button class="chat-action-btn" onclick="enableRename(${idx})">✏️</button>
-                        <button class="chat-action-btn" onclick="saveRename(${idx})" style="display:none;" id="save-btn-${idx}">💾</button>
-                        <button class="chat-action-btn" onclick="deleteChat(${idx})">🗑️</button>
+                        <button class="chat-action-btn" onclick="enableRename(${idx})" title="تعديل العنوان">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="chat-action-btn" onclick="saveRename(${idx})" style="display:none;" id="save-btn-${idx}" title="حفظ">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        </button>
+                        <button class="chat-action-btn" onclick="deleteChat(${idx})" title="حذف">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
                     </div>
                 `;
                 chatListContainer.appendChild(div);
@@ -639,7 +670,7 @@
             const input = document.getElementById(`chat-title-${idx}`);
             input.removeAttribute('readonly');
             input.focus();
-            document.getElementById(`save-btn-${idx}`).style.display = 'inline-block';
+            document.getElementById(`save-btn-${idx}`).style.display = 'flex';
         }
 
         window.saveRename = function(idx) {
@@ -662,7 +693,6 @@
             saveChatsToStorage();
         }
 
-        // إشعارات الحظر المتبادل للقسم القديم
         function showNotification(el) {
             el.style.display = 'block';
             setTimeout(() => { el.style.display = 'none'; }, 3000);
@@ -692,13 +722,12 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     sidebarAttachedFile = { name: file.name, content: event.target.result };
-                    fileDropTrigger.innerHTML = `📁 ${file.name}`;
+                    fileDropTrigger.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> ${file.name}`;
                 };
                 reader.readAsText(file);
             }
         };
 
-        // فحص الأخطاء القديم
         sidebarEditBtn.onclick = () => {
             const textCode = sidebarCodeInput.value.trim();
             const codeToAnalyze = sidebarAttachedFile ? sidebarAttachedFile.content : textCode;
@@ -727,7 +756,6 @@
             codeErrorsBox.appendChild(div);
         }
 
-        // --- قسم تصحيح الكود الجديد ---
         correctionCodeInput.oninput = () => {
             if (correctionAttachedFile && correctionCodeInput.value.trim().length > 0) {
                 correctionCodeInput.value = '';
@@ -754,7 +782,7 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     correctionAttachedFile = { name: file.name, content: event.target.result };
-                    correctionFileDropTrigger.innerHTML = `📁 ${file.name}`;
+                    correctionFileDropTrigger.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> ${file.name}`;
                 };
                 reader.readAsText(file);
             }
@@ -764,7 +792,7 @@
             correctionCodeInput.value = '';
             correctionAttachedFile = null;
             correctionFileInput.value = '';
-            correctionFileDropTrigger.innerHTML = '📁 رفع ملف';
+            correctionFileDropTrigger.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> رفع ملف`;
             correctionOutputBox.innerHTML = '<span style="color: #8b949e; direction: rtl; display: block; text-align: right;">في انتظار الإدخال والتصحيح...</span>';
             copyCorrectionBtn.style.display = 'none';
             latestCorrectedCode = '';
@@ -782,7 +810,6 @@
             let analysisLogs = [];
             let hasErrors = false;
 
-            // تصحيح الأخطاء الحرفية الشائعة وتحليلها
             if (corrected.includes('BackgrundColor3')) {
                 hasErrors = true;
                 analysisLogs.push('• حرف خطأ: "BackgrundColor3" تم تصحيحه إلى "BackgroundColor3"');
@@ -820,7 +847,6 @@
             });
         };
 
-        // إدارة إرسال الرسائل للشات الرئيسي
         userInput.addEventListener('input', () => {
             const val = userInput.value;
             if (val.length > 80 || (val.includes('\n') && (val.includes('local') || val.includes('function') || val.includes('game')))) {
@@ -887,6 +913,7 @@
                 userInput.value = '';
             }
 
+            userScrolledUp = false; // إعادة ضبط التمرير لكي ينزل للرسالة الجديدة
             appendUserMessage(messageToSend);
             const loadingId = appendLoadingMessage();
 
@@ -915,7 +942,7 @@
             msgDiv.className = 'message user-message';
             msgDiv.textContent = text;
             chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom(true);
         }
 
         function appendErrorMsg(errorText) {
@@ -924,7 +951,7 @@
             msgDiv.style.color = '#f85149';
             msgDiv.textContent = errorText;
             chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom(true);
         }
 
         function appendLoadingMessage() {
@@ -933,7 +960,7 @@
             msgDiv.id = 'loading-' + Date.now();
             msgDiv.textContent = 'جاري تنفيذ الطلب وتحليل الكود...';
             chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom(true);
             return msgDiv.id;
         }
 
@@ -965,7 +992,7 @@
                     `;
                     msgDiv.appendChild(codeBox);
                 }
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                scrollToBottom();
             }
         }
 
