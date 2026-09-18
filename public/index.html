@@ -3,508 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua AI</title>
+    <title>Lua AI Pro - Roblox Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
-        }
-        body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0b0d10;
-            color: #fff;
-            height: 100vh;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
         }
-        .app {
-            height: 100vh;
+
+        body {
+            background-color: #090d16;
+            color: #e6edf3;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        /* Header */
-        .header {
-            height: 64px;
+
+        header {
+            background-color: #0d1117;
+            padding: 16px 24px;
+            border-bottom: 1px solid #21262d;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #58a6ff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 22px;
-            border-bottom: 1px solid #20242a;
-            background: #0d1014;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 17px;
-            font-weight: 600;
+
+        .header-badge {
+            font-size: 0.75rem;
+            background: rgba(88, 166, 255, 0.1);
+            color: #58a6ff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(88, 166, 255, 0.3);
         }
-        .brand-icon {
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9px;
-            background: #1677ff;
-        }
-        .brand-icon svg {
-            width: 19px;
-            height: 19px;
-        }
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: #8c949f;
-            font-size: 12px;
-        }
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #31d158;
-        }
-        /* Chat */
-        .chat {
+
+        #chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 35px 18px;
-        }
-        .messages {
-            width: 100%;
-            max-width: 850px;
-            margin: auto;
-        }
-        .welcome {
-            text-align: center;
-            margin-top: 15vh;
-            color: #8c949f;
-        }
-        .welcome h1 {
-            color: #fff;
-            font-size: 27px;
-            margin-bottom: 10px;
-        }
-        .welcome p {
-            font-size: 14px;
-        }
-        .message {
+            padding: 24px;
             display: flex;
-            margin-bottom: 25px;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
         }
-        .message.user {
-            justify-content: flex-start;
+
+        #chat-container::-webkit-scrollbar {
+            width: 6px;
         }
-        .message.ai {
-            justify-content: flex-end;
-        }
-        .bubble {
-            max-width: 80%;
-            padding: 13px 16px;
-            border-radius: 14px;
-            font-size: 14px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-        .user .bubble {
-            background: #1677ff;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        .ai .bubble {
-            background: #15191e;
-            border: 1px solid #252a31;
-            color: #dce1e7;
-            border-bottom-left-radius: 4px;
-        }
-        /* Code Box */
-        .code-box {
-            margin-top: 12px;
-            background: #090b0e;
-            border: 1px solid #292f36;
+        #chat-container::-webkit-scrollbar-thumb {
+            background: #21262d;
             border-radius: 10px;
-            overflow: hidden;
-            direction: ltr;
-            text-align: left;
         }
-        .code-header {
-            height: 40px;
+
+        .message {
+            max-width: 85%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            line-height: 1.7;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #1f6feb, #1158c7);
+            color: #ffffff;
+            align-self: flex-start;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
+        }
+
+        .ai-message {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            align-self: flex-end;
+            border-bottom-left-radius: 4px;
+            width: 92%;
+            max-width: 950px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        /* اقتراحات ذكية */
+        .suggestions-container {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            background: #11151a;
-            border-bottom: 1px solid #292f36;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #21262d;
         }
-        .code-language {
-            color: #7e8792;
-            font-size: 11px;
+
+        .suggestion-chip {
+            background-color: #21262d;
+            color: #58a6ff;
+            border: 1px solid #30363d;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-chip:hover {
+            background-color: #1f6feb;
+            color: #fff;
+            border-color: #1f6feb;
+            transform: translateY(-2px);
+        }
+
+        /* صندوق الكود */
+        .code-box {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            margin: 14px 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .code-header {
+            background-color: #161b22;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            font-size: 0.8rem;
+            color: #8b949e;
             font-family: monospace;
         }
+
         .copy-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
-            border: 0;
-            background: transparent;
-            color: #89929d;
-            cursor: pointer;
-            font-size: 11px;
-            padding: 6px 8px;
-            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.2s;
         }
+
         .copy-btn:hover {
-            background: #20252b;
-            color: #fff;
+            background-color: #30363d;
+            color: #ffffff;
         }
-        .copy-btn svg {
-            width: 14px;
-            height: 14px;
-        }
-        pre {
-            margin: 0;
-            padding: 15px;
+
+        .code-content {
+            padding: 14px;
             overflow-x: auto;
-            color: #d9e0e8;
-            font-family: Consolas, monospace;
-            font-size: 13px;
-            line-height: 1.6;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.88rem;
+            color: #79c0ff;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.5;
         }
-        code {
-            font-family: inherit;
-        }
-        /* Input */
-        .input-area {
-            padding: 15px 18px 20px;
-            border-top: 1px solid #20242a;
-            background: #0d1014;
-        }
-        .input-wrapper {
-            max-width: 850px;
-            margin: auto;
+
+        #input-container {
+            background-color: #0d1117;
+            padding: 18px 24px;
+            border-top: 1px solid #21262d;
             display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            background: #15191e;
-            border: 1px solid #2a3037;
-            border-radius: 13px;
-            padding: 7px;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
         }
-        textarea {
+
+        #user-input {
             flex: 1;
-            min-height: 43px;
-            max-height: 140px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 12px 18px;
+            color: #e6edf3;
+            font-size: 0.95rem;
+            outline: none;
             resize: none;
-            border: 0;
-            outline: 0;
-            background: transparent;
-            color: white;
-            padding: 11px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
+            height: 50px;
+            max-height: 130px;
+            transition: border-color 0.2s;
         }
-        textarea::placeholder {
-            color: #69727d;
+
+        #user-input:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
         }
-        .send-btn {
-            width: 43px;
-            height: 43px;
-            border: 0;
-            border-radius: 9px;
-            background: #1677ff;
-            color: white;
+
+        #send-btn {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
         }
-        .send-btn:hover {
-            background: #0868ee;
+
+        #send-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2ea043, #3fb950);
         }
-        .send-btn:disabled {
-            opacity: .45;
-            cursor: default;
+
+        #send-btn svg {
+            fill: #ffffff;
+            width: 22px;
+            height: 22px;
         }
-        .send-btn svg {
-            width: 19px;
-            height: 19px;
+
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            height: 8px;
+            width: 8px;
+            background-color: #58a6ff;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
         }
-        .footer {
-            max-width: 850px;
-            margin: 7px auto 0;
-            color: #555e68;
-            font-size: 10px;
-            text-align: center;
-        }
-        @media (max-width: 600px) {
-            .header {
-                padding: 0 14px;
-            }
-            .chat {
-                padding: 20px 12px;
-            }
-            .bubble {
-                max-width: 90%;
-            }
-            .welcome {
-                margin-top: 12vh;
-            }
-        }
+        .loading-dots span:nth-child(2) { animation-delay: .2s; }
+        .loading-dots span:nth-child(3) { animation-delay: .4s; }
+        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
     </style>
 </head>
 <body>
-<div class="app">
-    <!-- Header -->
-    <header class="header">
-        <div class="brand">
-            <div class="brand-icon">
-                <!-- AI / Spark SVG -->
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-                    <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>
-                    <path d="M19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16z"/>
-                </svg>
-            </div>
-            Lua AI
-        </div>
-        <div class="status">
-            <span class="status-dot"></span>
-            متصل
-        </div>
+
+    <header>
+        <span>Lua AI Pro</span>
+        <span class="header-badge">Roblox Expert</span>
     </header>
-    <!-- Chat -->
-    <main class="chat" id="chat">
-        <div class="messages" id="messages">
-            <div class="welcome" id="welcome">
-                <h1>Lua AI</h1>
-                <p>
-                    مساعدك لبرمجة Roblox Studio باستخدام Lua
-                </p>
-            </div>
+
+    <div id="chat-container">
+        <div class="message ai-message">
+            أهلاً بك يا بطل! أنا مساعدك الذكي المخصص لـ Roblox Studio و Luau. اكتب سؤالك أو اطلب نظاماً كاملاً لنبدأ العمل!
         </div>
-    </main>
-    <!-- Input -->
-    <section class="input-area">
-        <div class="input-wrapper">
-            <textarea
-                id="messageInput"
-                placeholder="اكتب سؤالك عن Roblox أو Lua..."
-                rows="1"
-            ></textarea>
-            <button
-                class="send-btn"
-                id="sendBtn"
-                title="إرسال"
-            >
-                <!-- Send SVG -->
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-                    <path d="M22 2L11 13"/>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
-                </svg>
-            </button>
-        </div>
-        <div class="footer">
-            Lua AI قد يخطئ. تحقق من الأكواد قبل استخدامها.
-        </div>
-    </section>
-</div>
-<script>
-    const input = document.getElementById("messageInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const messages = document.getElementById("messages");
-    const chat = document.getElementById("chat");
-    const welcome = document.getElementById("welcome");
-    /* إرسال الرسالة */
-    async function sendMessage() {
-        const text = input.value.trim();
-        if (!text) return;
-        if (welcome) {
-            welcome.remove();
-        }
-        addMessage("user", escapeHTML(text));
-        input.value = "";
-        input.style.height = "43px";
-        sendBtn.disabled = true;
-        try {
-            /*
-             * هنا يتم الاتصال بالـ Backend الموجود في Render
-             */
-            const response = await fetch("/api/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: text
-                })
-            });
-            if (!response.ok) {
-                throw new Error("حدث خطأ في الاتصال بالسيرفر");
-            }
-            const data = await response.json();
-            addAIMessage(data.reply);
-        } catch (error) {
-            addMessage(
-                "ai",
-                "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي."
-            );
-            console.error(error);
-        } finally {
-            sendBtn.disabled = false;
-        }
-    }
-    /* إضافة رسالة عادية */
-    function addMessage(type, text) {
-        const message = document.createElement("div");
-        message.className = "message " + type;
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
-        bubble.innerHTML = text;
-        message.appendChild(bubble);
-        messages.appendChild(message);
-        scrollBottom();
-    }
-    /* رسالة AI */
-    function addAIMessage(text) {
-        const message = document.createElement("div");
-        message.className = "message ai";
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
-        /*
-         * نتوقع أن الـ Backend يرجع:
-         *
-         * النص العادي
-         *
-         * أو كود بالشكل:
-         *
-         * ```lua
-         * print("Hello")
-         * ```
-         */
-        const parts = parseCode(text);
-        if (parts.length === 1 && parts[0].type === "text") {
-            bubble.textContent = parts[0].content;
-        } else {
-            parts.forEach(part => {
-                if (part.type === "text") {
-                    const textElement = document.createElement("div");
-                    textElement.textContent = part.content;
-                    bubble.appendChild(textElement);
-                }
-                if (part.type === "code") {
-                    const codeBox = createCodeBox(part.content);
-                    bubble.appendChild(codeBox);
-                }
-            });
-        }
-        message.appendChild(bubble);
-        messages.appendChild(message);
-        scrollBottom();
-    }
-    /* تحويل Markdown code إلى أجزاء */
-    function parseCode(text) {
-        const result = [];
-        const regex = /```(?:lua|luau|javascript|js|text)?\s*([\s\S]*?)```/gi;
-        let lastIndex = 0;
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-            if (match.index > lastIndex) {
-                result.push({
-                    type: "text",
-                    content: text.slice(lastIndex, match.index).trim()
+    </div>
+
+    <div id="input-container">
+        <textarea id="user-input" placeholder="اكتب سؤالك أو اطلب كوداً برمجياً..."></textarea>
+        <button id="send-btn" title="إرسال">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+        </button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        async function sendMessage(textToSend) {
+            const text = textToSend || userInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user-message');
+            if (!textToSend) userInput.value = '';
+            
+            const loadingId = appendLoadingMessage();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
                 });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (data.success) {
+                    appendFormattedMessage(data.reply);
+                } else {
+                    appendMessage('خطأ: ' + (data.error || 'حدث مشكلة في السيرفر'), 'ai-message');
+                }
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                appendMessage('خطأ في الاتصال بالخادم.', 'ai-message');
             }
-            result.push({
-                type: "code",
-                content: match[1].trim()
-            });
-            lastIndex = regex.lastIndex;
         }
-        if (lastIndex < text.length) {
-            result.push({
-                type: "text",
-                content: text.slice(lastIndex).trim()
+
+        function appendMessage(text, className) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.textContent = text;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendLoadingMessage() {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai-message loading';
+            msgDiv.id = 'loading-' + Date.now();
+            msgDiv.innerHTML = 'جاري التفكير وصياغة الكود <div class="loading-dots"><span></span><span></span><span></span></div>';
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgDiv.id;
+        }
+
+        function appendFormattedMessage(fullContent) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai-message';
+
+            let mainText = fullContent;
+            let suggestions = [];
+
+            // استخراج الاقتراحات إذا وجدت
+            const sugMatch = fullContent.match(/[SUGGESTIONS]([\s\S]*?)(?:$)/);
+            if (sugMatch) {
+                suggestions = sugMatch[1].split('|').map(s => s.trim()).filter(Boolean);
+                mainText = fullContent.replace(sugMatch[0], '').trim();
+            }
+
+            // تقسيم الأكواد
+            const parts = mainText.split(/```lua([\s\S]*?)```/g);
+
+            for (let i = 0; i < parts.length; i++) {
+                if (i % 2 === 0) {
+                    if (parts[i].trim()) {
+                        const p = document.createElement('div');
+                        p.textContent = parts[i].trim();
+                        msgDiv.appendChild(p);
+                    }
+                } else {
+                    const codeBox = document.createElement('div');
+                    codeBox.className = 'code-box';
+                    codeBox.innerHTML = `
+                        <div class="code-header">
+                            <span>lua (Luau Script)</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                نسخ الكود
+                            </button>
+                        </div>
+                        <pre class="code-content"><code>${parts[i].trim()}</code></pre>
+                    `;
+                    msgDiv.appendChild(codeBox);
+                }
+            }
+
+            // إضافة أزرار الاقتراحات التفاعلية إن وجدت
+            if (suggestions.length > 0) {
+                const sugContainer = document.createElement('div');
+                sugContainer.className = 'suggestions-container';
+                suggestions.forEach(sug => {
+                    const chip = document.createElement('button');
+                    chip.className = 'suggestion-chip';
+                    chip.textContent = '💡 ' + sug;
+                    chip.onclick = () => sendMessage(sug);
+                    sugContainer.appendChild(chip);
+                });
+                msgDiv.appendChild(sugContainer);
+            }
+
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function copyCode(button) {
+            const codeText = button.closest('.code-box').querySelector('code').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                button.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم النسخ!`;
+                setTimeout(() => {
+                    button.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> نسخ الكود`;
+                }, 2000);
             });
         }
-        return result.filter(item => item.content);
-    }
-    /* إنشاء Code Box */
-    function createCodeBox(code) {
-        const box = document.createElement("div");
-        box.className = "code-box";
-        const header = document.createElement("div");
-        header.className = "code-header";
-        const language = document.createElement("span");
-        language.className = "code-language";
-        language.textContent = "Lua";
-        const copyButton = document.createElement("button");
-        copyButton.className = "copy-btn";
-        copyButton.title = "نسخ الكود";
-        copyButton.innerHTML = `
-            <svg viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-            <span>نسخ</span>
-        `;
-        const pre = document.createElement("pre");
-        const codeElement = document.createElement("code");
-        codeElement.textContent = code;
-        pre.appendChild(codeElement);
-        copyButton.addEventListener("click", async () => {
-            await navigator.clipboard.writeText(code);
-            copyButton.querySelector("span").textContent = "تم النسخ";
-            setTimeout(() => {
-                copyButton.querySelector("span").textContent = "نسخ";
-            }, 1500);
+
+        sendBtn.addEventListener('click', () => sendMessage());
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
-        header.appendChild(language);
-        header.appendChild(copyButton);
-        box.appendChild(header);
-        box.appendChild(pre);
-        return box;
-    }
-    /* إرسال بزر Enter */
-    input.addEventListener("keydown", event => {
-        if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            sendMessage();
-        }
-    });
-    /* تكبير Textarea */
-    input.addEventListener("input", () => {
-        input.style.height = "43px";
-        input.style.height =
-            Math.min(input.scrollHeight, 140) + "px";
-    });
-    /* النزول لآخر رسالة */
-    function scrollBottom() {
-        setTimeout(() => {
-            chat.scrollTop = chat.scrollHeight;
-        }, 50);
-    }
-    /* حماية النص */
-    function escapeHTML(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-</script>
+    </script>
 </body>
 </html>
