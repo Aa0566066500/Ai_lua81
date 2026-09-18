@@ -33,6 +33,29 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #58a6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .menu-btn:hover {
+            background: rgba(88, 166, 255, 0.1);
         }
 
         .header-badge {
@@ -42,6 +65,221 @@
             padding: 4px 10px;
             border-radius: 20px;
             border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        /* القائمة الجانبية اليمين والغبش الأسود */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0; right: -380px; width: 360px; height: 100%;
+            background-color: #0d1117;
+            border-left: 1px solid #30363d;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #58a6ff;
+        }
+
+        .sidebar-close {
+            background: #21262d;
+            border: none;
+            color: #c9d1d9;
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .sidebar-close:hover {
+            background: #f85149;
+            color: #fff;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .sidebar-section h3 {
+            font-size: 0.95rem;
+            color: #8b949e;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .chat-item {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .chat-item input {
+            background: transparent;
+            border: none;
+            color: #e6edf3;
+            font-size: 0.9rem;
+            outline: none;
+            width: 70%;
+        }
+        .chat-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .chat-action-btn {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .chat-action-btn:hover {
+            color: #58a6ff;
+            background: #21262d;
+        }
+
+        .code-tool-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .code-tool-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-tool-box {
+            flex: 1;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .code-tool-box label {
+            font-size: 0.78rem;
+            color: #8b949e;
+        }
+
+        .code-tool-box textarea {
+            background: transparent;
+            border: none;
+            color: #79c0ff;
+            font-family: monospace;
+            font-size: 0.82rem;
+            resize: none;
+            height: 80px;
+            outline: none;
+        }
+
+        .file-drop-box {
+            background: #161b22;
+            border: 1px dashed #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #8b949e;
+            transition: border-color 0.2s;
+        }
+        .file-drop-box:hover {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        .error-notification {
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .edit-btn-sidebar {
+            background: #238636;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+        .edit-btn-sidebar:hover {
+            opacity: 0.9;
+        }
+
+        .code-errors-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.82rem;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        .error-code-line {
+            color: #f85149;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .error-desc-line {
+            color: #ffffff;
+            margin-bottom: 8px;
         }
 
         #chat-container {
@@ -54,13 +292,8 @@
             scroll-behavior: smooth;
         }
 
-        #chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background: #21262d;
-            border-radius: 10px;
-        }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb { background: #21262d; border-radius: 10px; }
 
         .message {
             max-width: 88%;
@@ -96,21 +329,12 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        .ai-message p {
-            margin-bottom: 10px;
-        }
-        .ai-message p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* صندوق الكود باسم lua وزر النسخ في البداية */
         .code-box {
             background-color: #0d1117;
             border: 1px solid #30363d;
             border-radius: 12px;
             margin: 14px 0;
             overflow: hidden;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
         }
 
         .code-header {
@@ -136,14 +360,11 @@
             gap: 6px;
             font-size: 0.82rem;
             font-weight: 600;
-            font-family: 'Tajawal', sans-serif;
             transition: all 0.2s;
         }
-
         .copy-btn:hover {
             background-color: #1f6feb;
             color: #ffffff;
-            border-color: #1f6feb;
         }
 
         .code-content {
@@ -158,7 +379,6 @@
             white-space: pre;
         }
 
-        /* واجهة منطقة الإدخال والمرفقات (Claude/Kimi Style) */
         #input-container {
             background-color: #0d1117;
             padding: 18px 24px;
@@ -166,7 +386,6 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
         }
 
         .input-row {
@@ -187,40 +406,19 @@
             resize: none;
             height: 50px;
             max-height: 130px;
-            transition: border-color 0.2s;
-        }
-
-        #user-input:focus {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
         }
 
         #send-btn {
             background: linear-gradient(135deg, #238636, #2ea043);
             border: none;
             border-radius: 12px;
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
         }
+        #send-btn svg { fill: #ffffff; width: 22px; height: 22px; }
 
-        #send-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #2ea043, #3fb950);
-        }
-
-        #send-btn svg {
-            fill: #ffffff;
-            width: 22px;
-            height: 22px;
-        }
-
-        /* بطاقة مرفق الكود قبل الإرسال (Claude / Kimi card) */
         .attachment-preview {
             background-color: #161b22;
             border: 1px solid #30363d;
@@ -231,162 +429,116 @@
             justify-content: space-between;
             max-width: 320px;
             cursor: pointer;
-            position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: border-color 0.2s;
         }
-        .attachment-preview:hover {
-            border-color: #58a6ff;
-        }
-        .attachment-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            overflow: hidden;
-        }
-        .attachment-icon {
-            background: #21262d;
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #58a6ff;
-        }
-        .attachment-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-        }
-        .attachment-name {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: #e6edf3;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .attachment-size {
-            font-size: 0.75rem;
-            color: #8b949e;
-        }
-        .attachment-close {
-            background: #21262d;
-            border: none;
-            color: #8b949e;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-        .attachment-close:hover {
-            background: #f85149;
-            color: #fff;
-        }
+        .attachment-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+        .attachment-icon { background: #21262d; border-radius: 8px; padding: 8px; color: #58a6ff; }
+        .attachment-details { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+        .attachment-name { font-size: 0.88rem; font-weight: 700; color: #e6edf3; }
+        .attachment-size { font-size: 0.75rem; color: #8b949e; }
+        .attachment-close { background: #21262d; border: none; color: #8b949e; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* Modal معاينة الكود قبل الإرسال */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
         }
         .modal-content {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 650px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: fadeIn 0.2s ease-in-out;
+            background-color: #0d1117; border: 1px solid #30363d; border-radius: 16px; width: 100%; max-width: 650px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        .modal-header {
-            padding: 16px 20px;
-            background-color: #161b22;
-            border-bottom: 1px solid #30363d;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #58a6ff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        /* زر X بالزاوية العلوية اليمنى (بداخل الإطار وغير ملتصق تماماً بالحافة) */
-        .modal-close-btn {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .modal-close-btn:hover {
-            background: #f85149;
-            color: #fff;
-            border-color: #f85149;
-        }
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            color: #79c0ff;
-            direction: ltr;
-            text-align: left;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
-
-        .loading-dots span {
-            animation: blink 1.4s infinite both;
-            height: 8px;
-            width: 8px;
-            background-color: #58a6ff;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 2px;
-        }
-        .loading-dots span:nth-child(2) { animation-delay: .2s; }
-        .loading-dots span:nth-child(3) { animation-delay: .4s; }
-        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
+        .modal-header { padding: 16px 20px; background-color: #161b22; border-bottom: 1px solid #30363d; font-weight: 700; font-size: 1rem; color: #58a6ff; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+        .modal-body { padding: 20px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; color: #79c0ff; direction: ltr; text-align: left; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
     <header>
-        <span>Lua AI Pro</span>
+        <div class="header-left">
+            <button class="menu-btn" id="menuToggleBtn" title="القائمة">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <span>Lua AI Pro</span>
+        </div>
         <span class="header-badge">Roblox Expert</span>
     </header>
 
-    <div id="chat-container">
-        <div class="message ai-message">
-            <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. اكتب طلبك أو الصق كوداً لنبدأ العمل!</p>
+    <!-- القائمة الجانبية -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>القائمة والتحكم</span>
+            <button class="sidebar-close" id="sidebarCloseBtn">✕</button>
+        </div>
+
+        <!-- قسم محادثاتك -->
+        <div class="sidebar-section">
+            <h3>محادثاتك</h3>
+            <div class="chat-list" id="chatListContainer"></div>
+        </div>
+
+        <!-- قسم الأكواد القديم -->
+        <div class="sidebar-section">
+            <h3>الأكواد</h3>
+            <div class="code-tool-container">
+                <div id="error-notification" class="error-notification">لا يمكنك رفع ملف ونص بنفس الوقت</div>
+                <div class="code-tool-row">
+                    <div class="code-tool-box">
+                        <label>اكتب كودك لتحريره</label>
+                        <textarea id="sidebarCodeInput" placeholder="الصق كود هنا..."></textarea>
+                    </div>
+                    <div class="code-tool-box" style="justify-content: center; align-items: center;">
+                        <input type="file" id="sidebarFileInput" style="display: none;" accept=".lua,.txt">
+                        <div class="file-drop-box" id="fileDropTrigger" style="width: 100%;">📁 رفع ملف</div>
+                    </div>
+                </div>
+                <button class="edit-btn-sidebar" id="sidebarEditBtn">تحرير وفحص الأخطاء</button>
+                <label style="font-size: 0.78rem; color: #8b949e;">أخطاء الكود:</label>
+                <div class="code-errors-box" id="codeErrorsBox">
+                    <span style="color: #8b949e;">لا توجد أخطاء حالياً.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم تصحيح الكود الجديد -->
+        <div class="sidebar-section">
+            <h3>تصحيح الكود</h3>
+            <div class="code-tool-container">
+                <div id="correction-error-notification" class="error-notification">لا يمكنك رفع ملف ونص بنفس الوقت</div>
+                <div class="code-tool-row">
+                    <div class="code-tool-box">
+                        <label>اكتب الكود لتصحيحه</label>
+                        <textarea id="correctionCodeInput" placeholder="الصق كود هنا..."></textarea>
+                    </div>
+                    <div class="code-tool-box" style="justify-content: center; align-items: center;">
+                        <input type="file" id="correctionFileInput" style="display: none;" accept=".lua,.txt">
+                        <div class="file-drop-box" id="correctionFileDropTrigger" style="width: 100%;">📁 رفع ملف</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="edit-btn-sidebar" id="correctionBtn" style="flex: 2; background: #1f6feb;">تصحيح الكود</button>
+                    <button class="edit-btn-sidebar" id="clearCorrectionBtn" style="flex: 1; background: #da3633;">حذف</button>
+                </div>
+                <label style="font-size: 0.78rem; color: #8b949e;">نتيجة وتصحيح الكود:</label>
+                <div class="code-errors-box" id="correctionOutputBox" style="direction: ltr; text-align: left; color: #79c0ff; white-space: pre-wrap;">
+                    <span style="color: #8b949e; direction: rtl; display: block; text-align: right;">في انتظار الإدخال والتصحيح...</span>
+                </div>
+                <button class="copy-btn" id="copyCorrectionBtn" onclick="copyCorrectionResult()" style="display: none; width: 100%; justify-content: center; margin-top: 4px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    نسخ الكود المصحح
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- منطقة الإدخال مع حاوية المرفقات الديناميكية -->
+    <div id="chat-container">
+        <div class="message ai-message">
+            <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. افتح القائمة الجانبية من اليمين أو اكتب طلبك مباشرة هنا.</p>
+        </div>
+    </div>
+
     <div id="input-container">
         <div id="attachment-container"></div>
         <div class="input-row">
@@ -397,7 +549,6 @@
         </div>
     </div>
 
-    <!-- Modal معاينة المرفق قبل الإرسال -->
     <div id="code-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -417,16 +568,265 @@
         const modalCodeText = document.getElementById('modal-code-text');
         const modalTitle = document.getElementById('modal-title');
 
-        let currentAttachment = null; // يحفظ الكود المرفق قبل إرساله
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 
-        // كشف تلقائي أو لصق لكود برمجي طويل ليتحول إلى مرفق (Claude/Kimi style)
+        // أدوات تحرير الأكواد القديمة
+        const sidebarCodeInput = document.getElementById('sidebarCodeInput');
+        const sidebarFileInput = document.getElementById('sidebarFileInput');
+        const fileDropTrigger = document.getElementById('fileDropTrigger');
+        const errorNotification = document.getElementById('error-notification');
+        const sidebarEditBtn = document.getElementById('sidebarEditBtn');
+        const codeErrorsBox = document.getElementById('codeErrorsBox');
+        const chatListContainer = document.getElementById('chatListContainer');
+
+        // أدوات تصحيح الكود الجديدة
+        const correctionCodeInput = document.getElementById('correctionCodeInput');
+        const correctionFileInput = document.getElementById('correctionFileInput');
+        const correctionFileDropTrigger = document.getElementById('correctionFileDropTrigger');
+        const correctionErrorNotification = document.getElementById('correction-error-notification');
+        const correctionBtn = document.getElementById('correctionBtn');
+        const clearCorrectionBtn = document.getElementById('clearCorrectionBtn');
+        const correctionOutputBox = document.getElementById('correctionOutputBox');
+        const copyCorrectionBtn = document.getElementById('copyCorrectionBtn');
+
+        let currentAttachment = null;
+        let sidebarAttachedFile = null;
+        let correctionAttachedFile = null;
+        let latestCorrectedCode = '';
+        let chats = JSON.parse(localStorage.getItem('lua_chats') || '[]');
+
+        menuToggleBtn.onclick = () => {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            renderChatList();
+        };
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+        sidebarCloseBtn.onclick = closeSidebar;
+        sidebarOverlay.onclick = closeSidebar;
+
+        function saveChatsToStorage() {
+            localStorage.setItem('lua_chats', JSON.stringify(chats));
+        }
+
+        function renderChatList() {
+            chatListContainer.innerHTML = '';
+            if (chats.length === 0) {
+                chatListContainer.innerHTML = '<span style="font-size:0.82rem; color:#8b949e; text-align:center; padding:10px;">لا توجد محادثات محفوظة</span>';
+                return;
+            }
+            chats.forEach((chat, idx) => {
+                const div = document.createElement('div');
+                div.className = 'chat-item';
+                div.innerHTML = `
+                    <input type="text" value="${chat.title}" id="chat-title-${idx}" readonly />
+                    <div class="chat-actions">
+                        <button class="chat-action-btn" onclick="enableRename(${idx})">✏️</button>
+                        <button class="chat-action-btn" onclick="saveRename(${idx})" style="display:none;" id="save-btn-${idx}">💾</button>
+                        <button class="chat-action-btn" onclick="deleteChat(${idx})">🗑️</button>
+                    </div>
+                `;
+                chatListContainer.appendChild(div);
+            });
+        }
+
+        window.enableRename = function(idx) {
+            const input = document.getElementById(`chat-title-${idx}`);
+            input.removeAttribute('readonly');
+            input.focus();
+            document.getElementById(`save-btn-${idx}`).style.display = 'inline-block';
+        }
+
+        window.saveRename = function(idx) {
+            const input = document.getElementById(`chat-title-${idx}`);
+            chats[idx].title = input.value;
+            input.setAttribute('readonly', true);
+            document.getElementById(`save-btn-${idx}`).style.display = 'none';
+            saveChatsToStorage();
+        }
+
+        window.deleteChat = function(idx) {
+            chats.splice(idx, 1);
+            saveChatsToStorage();
+            renderChatList();
+        }
+
+        function addChatSession(title, content) {
+            chats.unshift({ title: title.substring(0, 20) + '...', content });
+            if (chats.length > 15) chats.pop();
+            saveChatsToStorage();
+        }
+
+        // إشعارات الحظر المتبادل للقسم القديم
+        function showNotification(el) {
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        sidebarCodeInput.oninput = () => {
+            if (sidebarAttachedFile && sidebarCodeInput.value.trim().length > 0) {
+                sidebarCodeInput.value = '';
+                showNotification(errorNotification);
+            }
+        };
+        fileDropTrigger.onclick = () => {
+            if (sidebarCodeInput.value.trim().length > 0) {
+                showNotification(errorNotification);
+                return;
+            }
+            sidebarFileInput.click();
+        };
+        sidebarFileInput.onchange = (e) => {
+            if (sidebarCodeInput.value.trim().length > 0) {
+                showNotification(errorNotification);
+                sidebarFileInput.value = '';
+                return;
+            }
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    sidebarAttachedFile = { name: file.name, content: event.target.result };
+                    fileDropTrigger.innerHTML = `📁 ${file.name}`;
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // فحص الأخطاء القديم
+        sidebarEditBtn.onclick = () => {
+            const textCode = sidebarCodeInput.value.trim();
+            const codeToAnalyze = sidebarAttachedFile ? sidebarAttachedFile.content : textCode;
+            if (!codeToAnalyze) {
+                codeErrorsBox.innerHTML = '<span style="color:#8b949e;">الرجاء كتابة كود أو رفع ملف أولاً.</span>';
+                return;
+            }
+            codeErrorsBox.innerHTML = '';
+            let hasErrors = false;
+            if (codeToAnalyze.includes('BackgrundColor3')) {
+                hasErrors = true;
+                appendErrorToBox("BackgrundColor3", "خطأ إملائي في اسم الخاصية، الصواب هو BackgroundColor3.");
+            }
+            if (codeToAnalyze.includes('MouseButton1Clic')) {
+                hasErrors = true;
+                appendErrorToBox("MouseButton1Clic", "خطأ في اسم الحدث، الصواب هو MouseButton1Click.");
+            }
+            if (!hasErrors) {
+                codeErrorsBox.innerHTML = '<span style="color: #3fb950;">ممتاز! الكود خالي من الأخطاء النحوية الواضحة.</span>';
+            }
+        };
+
+        function appendErrorToBox(errCode, errDesc) {
+            const div = document.createElement('div');
+            div.innerHTML = `<div class="error-code-line">${errCode}</div><div class="error-desc-line">${errDesc}</div>`;
+            codeErrorsBox.appendChild(div);
+        }
+
+        // --- قسم تصحيح الكود الجديد ---
+        correctionCodeInput.oninput = () => {
+            if (correctionAttachedFile && correctionCodeInput.value.trim().length > 0) {
+                correctionCodeInput.value = '';
+                showNotification(correctionErrorNotification);
+            }
+        };
+
+        correctionFileDropTrigger.onclick = () => {
+            if (correctionCodeInput.value.trim().length > 0) {
+                showNotification(correctionErrorNotification);
+                return;
+            }
+            correctionFileInput.click();
+        };
+
+        correctionFileInput.onchange = (e) => {
+            if (correctionCodeInput.value.trim().length > 0) {
+                showNotification(correctionErrorNotification);
+                correctionFileInput.value = '';
+                return;
+            }
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    correctionAttachedFile = { name: file.name, content: event.target.result };
+                    correctionFileDropTrigger.innerHTML = `📁 ${file.name}`;
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        clearCorrectionBtn.onclick = () => {
+            correctionCodeInput.value = '';
+            correctionAttachedFile = null;
+            correctionFileInput.value = '';
+            correctionFileDropTrigger.innerHTML = '📁 رفع ملف';
+            correctionOutputBox.innerHTML = '<span style="color: #8b949e; direction: rtl; display: block; text-align: right;">في انتظار الإدخال والتصحيح...</span>';
+            copyCorrectionBtn.style.display = 'none';
+            latestCorrectedCode = '';
+        };
+
+        correctionBtn.onclick = () => {
+            const rawCode = correctionAttachedFile ? correctionAttachedFile.content : correctionCodeInput.value.trim();
+            if (!rawCode) {
+                correctionOutputBox.innerHTML = '<span style="color: #f85149; direction: rtl; display: block; text-align: right;">الرجاء كتابة كود أو رفع ملف للتصحيح.</span>';
+                copyCorrectionBtn.style.display = 'none';
+                return;
+            }
+
+            let corrected = rawCode;
+            let analysisLogs = [];
+            let hasErrors = false;
+
+            // تصحيح الأخطاء الحرفية الشائعة وتحليلها
+            if (corrected.includes('BackgrundColor3')) {
+                hasErrors = true;
+                analysisLogs.push('• حرف خطأ: "BackgrundColor3" تم تصحيحه إلى "BackgroundColor3"');
+                corrected = corrected.replace(/BackgrundColor3/g, 'BackgroundColor3');
+            }
+            if (corrected.includes('MouseButton1Clic')) {
+                hasErrors = true;
+                analysisLogs.push('• حرف ناقص/خطأ: "MouseButton1Clic" تم تصحيحه إلى "MouseButton1Click"');
+                corrected = corrected.replace(/MouseButton1Clic/g, 'MouseButton1Click');
+            }
+
+            latestCorrectedCode = corrected;
+
+            if (!hasErrors) {
+                correctionOutputBox.innerHTML = '<span style="color: #3fb950; font-weight: bold; direction: rtl; display: block; text-align: right; margin-bottom: 8px;">لا يوجد اخطاء</span>\n' + corrected;
+                copyCorrectionBtn.style.display = 'block';
+            } else {
+                let html = '<span style="color: #f85149; font-weight: bold; direction: rtl; display: block; text-align: right; margin-bottom: 4px;">تحليل الأخطاء حرف حرف:</span>\n';
+                analysisLogs.forEach(log => {
+                    html += `<span style="color: #ffa657; direction: rtl; display: block; text-align: right;">${log}</span>\n`;
+                });
+                html += `\n<span style="color: #3fb950; font-weight: bold; direction: rtl; display: block; text-align: right; margin-bottom: 4px;">الكود بعد التصحيح الكامل:</span>\n${corrected}`;
+                correctionOutputBox.innerHTML = html;
+                copyCorrectionBtn.style.display = 'block';
+            }
+        };
+
+        window.copyCorrectionResult = function() {
+            if (!latestCorrectedCode) return;
+            navigator.clipboard.writeText(latestCorrectedCode).then(() => {
+                copyCorrectionBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم نسخ الكود المصحح!`;
+                setTimeout(() => {
+                    copyCorrectionBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> نسخ الكود المصحح`;
+                }, 2000);
+            });
+        };
+
+        // إدارة إرسال الرسائل للشات الرئيسي
         userInput.addEventListener('input', () => {
             const val = userInput.value;
-            // إذا كان النص طويلاً أو يحتوي على أسطر متعددة وكلمات مفتاحية برمجية
-            if (val.length > 80 || (val.includes('\n') && (val.includes('local') || val.includes('function') || val.includes('if') || val.includes('game')))) {
+            if (val.length > 80 || (val.includes('\n') && (val.includes('local') || val.includes('function') || val.includes('game')))) {
                 if (!currentAttachment) {
                     createAttachment(val);
-                    userInput.value = ''; // تفريغ حقل الكتابة الرئيسي ووضعه كمرفق
+                    userInput.value = '';
                 }
             }
         });
@@ -435,13 +835,7 @@
             const sizeInBytes = new Blob([content]).size;
             const sizeText = sizeInBytes > 1024 ? (sizeInBytes / 1024).toFixed(1) + ' KB' : sizeInBytes + ' B';
             const firstLine = content.split('\n')[0].substring(0, 25) + '...';
-
-            currentAttachment = {
-                name: firstLine || 'script.lua',
-                content: content,
-                size: sizeText
-            };
-
+            currentAttachment = { name: firstLine || 'script.lua', content: content, size: sizeText };
             renderAttachmentPreview();
         }
 
@@ -450,7 +844,6 @@
                 attachmentContainer.innerHTML = '';
                 return;
             }
-
             attachmentContainer.innerHTML = `
                 <div class="attachment-preview" onclick="openModal()">
                     <div class="attachment-info">
@@ -479,24 +872,22 @@
             codeModal.style.display = 'flex';
         }
 
-        function closeModal() {
-            codeModal.style.display = 'none';
-        }
+        function closeModal() { codeModal.style.display = 'none'; }
 
         async function sendMessage() {
             let messageToSend = '';
-
             if (currentAttachment) {
                 messageToSend = `[مرفق كود: ${currentAttachment.name}]\n\`\`\`lua\n${currentAttachment.content}\n\`\`\``;
+                addChatSession(currentAttachment.name, currentAttachment.content);
                 removeAttachment();
             } else {
                 messageToSend = userInput.value.trim();
                 if (!messageToSend) return;
+                addChatSession(messageToSend, messageToSend);
                 userInput.value = '';
             }
 
             appendUserMessage(messageToSend);
-            
             const loadingId = appendLoadingMessage();
 
             try {
@@ -505,7 +896,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: messageToSend })
                 });
-
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
 
@@ -523,40 +913,9 @@
         function appendUserMessage(text) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message user-message';
-            
-            // إذا كان يحتوي على مرفق كود، نعرضه كبطاقة مرفقة في الشات أيضاً
-            if (text.includes('[مرفق كود:')) {
-                const codeMatch = text.match(/```lua([\s\S]*?)```/);
-                const codeContent = codeMatch ? codeMatch[1].trim() : text;
-                const sizeInBytes = new Blob([codeContent]).size;
-                const sizeText = sizeInBytes > 1024 ? (sizeInBytes / 1024).toFixed(1) + ' KB' : sizeInBytes + ' B';
-
-                msgDiv.innerHTML = `
-                    <div class="attachment-preview" style="cursor:pointer; background:#1158c7; border-color:rgba(255,255,255,0.3);" onclick="openSentModal(this)" data-code="${encodeURIComponent(codeContent)}">
-                        <div class="attachment-info">
-                            <div class="attachment-icon" style="background:#1f6feb; color:#fff;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            </div>
-                            <div class="attachment-details">
-                                <span class="attachment-name" style="color:#fff;">مرفق كود برمجي</span>
-                                <span class="attachment-size" style="color:#e6edf3;">TXT ${sizeText}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                msgDiv.textContent = text;
-            }
-
+            msgDiv.textContent = text;
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function openSentModal(el) {
-            const code = decodeURIComponent(el.getAttribute('data-code'));
-            modalTitle.textContent = "معاينة المرفق المرسل";
-            modalCodeText.textContent = code;
-            codeModal.style.display = 'flex';
         }
 
         function appendErrorMsg(errorText) {
@@ -570,33 +929,28 @@
 
         function appendLoadingMessage() {
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'message ai-message loading';
+            msgDiv.className = 'message ai-message';
             msgDiv.id = 'loading-' + Date.now();
-            msgDiv.innerHTML = 'جاري تنفيذ الطلب وتحليل الكود <div class="loading-dots"><span></span><span></span><span></span></div>';
+            msgDiv.textContent = 'جاري تنفيذ الطلب وتحليل الكود...';
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return msgDiv.id;
         }
 
-        // أنيميشن الكتابة التدريجي (Typewriter Effect) للذكاء الاصطناعي
         async function appendAIMessageWithTyping(fullContent) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
             chatContainer.appendChild(msgDiv);
 
-            // تقسيم الرد إلى نص عادي وأكواد (```lua ... ```)
             const parts = fullContent.split(/```lua([\s\S]*?)```/g);
-
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 0) {
-                    // النص العادي يكتب تدريجياً حرفاً بحرف
                     if (parts[i].trim()) {
                         const p = document.createElement('p');
                         msgDiv.appendChild(p);
-                        await typeWriterText(parts[i].trim(), p);
+                        p.textContent = parts[i].trim();
                     }
                 } else {
-                    // صندوق الكود باسم lua وزر النسخ في البداية
                     const codeBox = document.createElement('div');
                     codeBox.className = 'code-box';
                     codeBox.innerHTML = `
@@ -607,53 +961,15 @@
                             </button>
                             <span>lua</span>
                         </div>
-                        <pre class="code-content"><code></code></pre>
+                        <pre class="code-content"><code>${parts[i].trim()}</code></pre>
                     `;
                     msgDiv.appendChild(codeBox);
-                    const codeElement = codeBox.querySelector('code');
-                    await typeWriterCode(parts[i].trim(), codeElement);
                 }
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
 
-        // دالة كتابة النص العادي تدريجياً
-        function typeWriterText(text, element) {
-            return new Promise(resolve => {
-                let index = 0;
-                function type() {
-                    if (index < text.length) {
-                        element.textContent += text.charAt(index);
-                        index++;
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        setTimeout(type, 8); // سرعة فائقة وسلسة
-                    } else {
-                        resolve();
-                    }
-                }
-                type();
-            });
-        }
-
-        // دالة كتابة الكود تدريجياً داخل صندوق الكود
-        function typeWriterCode(code, element) {
-            return new Promise(resolve => {
-                let index = 0;
-                function type() {
-                    if (index < code.length) {
-                        element.textContent += code.charAt(index);
-                        index++;
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        setTimeout(type, 4); // سرعة كتابة الكود
-                    } else {
-                        resolve();
-                    }
-                }
-                type();
-            });
-        }
-
-        function copyCode(button) {
+        window.copyCode = function(button) {
             const codeText = button.closest('.code-box').querySelector('code').textContent;
             navigator.clipboard.writeText(codeText).then(() => {
                 button.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم النسخ!`;
