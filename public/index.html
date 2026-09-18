@@ -11,22 +11,23 @@
         /* القائمة الجانبية بالثيم الأبيض النقي */
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 900; }
         .sidebar { width: 280px; background: #ffffff; border-left: 1px solid #d0d7de; display: flex; flex-direction: column; height: 100%; z-index: 1000; transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.05); }
-        .sidebar-header { padding: 15px; border-bottom: 1px solid #d0d7de; font-weight: bold; color: #0969da; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid #d0d7de; font-weight: bold; color: #24292e; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .sidebar-content label { font-size: 12px; color: #0969da; font-weight: bold; }
+        .sidebar-content label { font-size: 12px; color: #57606a; font-weight: bold; }
         .sidebar-content input, .sidebar-content textarea { width: 100%; background: #f6f8fa; border: 1px solid #d0d7de; color: #24292e; padding: 8px; border-radius: 6px; font-size: 12px; }
         
-        .new-chat-btn { background: #0969da; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .new-chat-btn:hover { background: #0550ae; }
+        .new-chat-btn { background: #f6f8fa; color: #24292e; border: 1px solid #d0d7de; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+        .new-chat-btn:hover { background: #eaeef2; }
 
         /* منطقة الدردشة الرئيسية */
         .main-chat-area { flex: 1; display: flex; flex-direction: column; background: #f4f6f9; height: 100vh; position: relative; min-width: 0; }
         
         .chat-header { background: #ffffff; padding: 12px 15px; border-bottom: 1px solid #d0d7de; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .chat-header h2 { font-size: 15px; color: #0969da; }
+        .chat-header h2 { font-size: 15px; color: #24292e; }
         
-        .menu-toggle { background: #0969da; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; transition: background 0.2s; }
-        .menu-toggle:hover { background: #0550ae; }
+        /* أزرار بلا خلفية زرقاء */
+        .icon-btn { background: transparent; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; color: #57606a; transition: background 0.2s, color 0.2s; }
+        .icon-btn:hover { background: #f0f3f6; color: #24292e; }
 
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
@@ -34,23 +35,16 @@
         .user-message { background: #0969da; color: white; align-self: flex-start; }
         .ai-message { background: #ffffff; border: 1px solid #d0d7de; color: #24292e; align-self: flex-end; white-space: pre-wrap; font-family: monospace; }
 
-        /* شريط الإدخال السفلي وأيقونات بيضاء بخلفيات زرقاء متناسقة */
+        /* شريط الإدخال السفلي بدون أي أزرق */
         .chat-input-area { background: #ffffff; padding: 12px; border-top: 1px solid #d0d7de; display: flex; flex-direction: column; gap: 8px; }
-        .file-preview-bar { display: none; align-items: center; justify-content: space-between; background: #f6f8fa; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: 1px solid #0969da; }
-        .file-preview-bar span { color: #0969da; font-weight: bold; }
+        .file-preview-bar { display: none; align-items: center; justify-content: space-between; background: #f6f8fa; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: 1px solid #d0d7de; }
+        .file-preview-bar span { color: #24292e; font-weight: bold; }
         
-        .remove-file { background: #cf222e; border: none; border-radius: 4px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .remove-file { background: transparent; border: none; color: #cf222e; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 2px; }
 
-        .input-box-container { display: flex; align-items: center; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 10px; padding: 8px 12px; gap: 10px; }
-        .input-box-container:focus-within { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,0.1); }
+        .input-box-container { display: flex; align-items: center; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 10px; padding: 6px 10px; gap: 6px; }
+        .input-box-container:focus-within { border-color: #57606a; box-shadow: 0 0 0 3px rgba(84,92,102,0.1); }
         .input-box-container textarea { flex: 1; background: transparent; border: none; color: #24292e; resize: none; height: 24px; max-height: 100px; font-size: 13px; font-family: Tahoma, sans-serif; outline: none; }
-        
-        .action-icon-btn { background: #0969da; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; transition: background 0.2s; }
-        .action-icon-btn:hover { background: #0550ae; }
-        
-        /* زر الإرسال بدون لون أخضر (تم تغييره للأزرق الأنيق) */
-        .send-icon-btn { background: #0969da; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .send-icon-btn:hover { background: #0550ae; }
 
         /* التجاوب مع الشاشات الصغيرة */
         @media (max-width: 768px) {
@@ -68,9 +62,9 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>الإعدادات والتحكم</span>
-            <button class="action-icon-btn" onclick="toggleSidebar()" title="إغلاق">
-                <!-- SVG Close Icon (White) -->
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button class="icon-btn" onclick="toggleSidebar()" title="إغلاق">
+                <!-- SVG X Close Icon -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -78,8 +72,8 @@
         </div>
         <div class="sidebar-content">
             <button class="new-chat-btn" onclick="clearChat()">
-                <!-- SVG Plus Icon (White) -->
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- SVG Plus Icon -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
@@ -94,9 +88,9 @@
     <!-- منطقة الدردشة الرئيسية -->
     <div class="main-chat-area">
         <div class="chat-header">
-            <button class="menu-toggle" onclick="toggleSidebar()" title="القائمة">
-                <!-- SVG Hamburger Menu Icon (White) -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button class="icon-btn" onclick="toggleSidebar()" title="القائمة">
+                <!-- SVG Menu Hamburger Icon -->
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -114,26 +108,52 @@
             <div class="file-preview-bar" id="filePreviewBar">
                 <span id="fileName"></span>
                 <button class="remove-file" onclick="removeFile()" title="حذف الملف">
-                    <!-- SVG Small Close Icon (White) -->
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- SVG X Small Icon -->
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
             <div class="input-box-container">
-                <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect()">
-                <button class="action-icon-btn" onclick="document.getElementById('fileInput').click()" title="إرفاق ملف">
-                    <!-- SVG Plus/Attachment Icon (White) -->
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                <!-- أزرار الإرفاق المخصصة (ألبوم، ملف، كاميرا) وكلها SVG نظيف بلا أزرق -->
+                
+                <!-- 1. ألبوم الصور (Gallery / Album) -->
+                <input type="file" id="albumInput" accept="image/*" style="display:none;" onchange="handleFileSelect(this)">
+                <button class="icon-btn" onclick="document.getElementById('albumInput').click()" title="ألبوم الصور">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                 </button>
+
+                <!-- 2. رفع ملف (Document / File) -->
+                <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect(this)">
+                <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="رفع ملف">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </button>
+
+                <!-- 3. الكاميرا (Camera) -->
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(this)">
+                <button class="icon-btn" onclick="document.getElementById('cameraInput').click()" title="التقاط كاميرا">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                </button>
+
+                <!-- صندوق النص -->
                 <textarea id="messageInput" placeholder="اكتب رسالتك أو الصق الكود هنا..." rows="1" oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
-                <button class="send-icon-btn" onclick="sendMessage()" title="إرسال">
-                    <!-- SVG Send Arrow Icon (White) -->
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                
+                <!-- زر الإرسال (سهم SVG نظيف بلا أخضر أو أزرق) -->
+                <button class="icon-btn" onclick="sendMessage()" title="إرسال">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
@@ -152,8 +172,7 @@
             overlay.classList.toggle('open');
         }
 
-        function handleFileSelect() {
-            const input = document.getElementById('fileInput');
+        function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
@@ -163,7 +182,7 @@
                         data: e.target.result.split(',')[1],
                         mimeType: file.type || 'text/plain'
                     };
-                    document.getElementById('fileName').innerText = '📄 ' + file.name;
+                    document.getElementById('fileName').innerText = '📎 ' + file.name;
                     document.getElementById('filePreviewBar').style.display = 'flex';
                 };
                 reader.readAsDataURL(file);
@@ -172,7 +191,9 @@
 
         function removeFile() {
             attachedFile = null;
+            document.getElementById('albumInput').value = '';
             document.getElementById('fileInput').value = '';
+            document.getElementById('cameraInput').value = '';
             document.getElementById('filePreviewBar').style.display = 'none';
         }
 
