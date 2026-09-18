@@ -6,17 +6,14 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '10mb' }));
+// زيادة حد حجم البيانات لاستقبال الصور العالية الدقة
+app.use(express.json({ limit: '25mb' }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message } = req.body;
-
-        if (!message) {
-            return res.status(400).json({ success: false, error: 'الرسالة فارغة' });
-        }
+        const { message, image, model: requestedModel } = req.body;
 
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
@@ -28,13 +25,35 @@ app.post('/api/chat', async (req, res) => {
 
         const genAI = new GoogleGenerativeAI(apiKey);
         
-        // التحديث لنموذج gemini-3.8-flash الظاهر في استديو جوجل
+        // تحديد النموذج المختار (3.5 Flash-Lite أو 3.6 Flash)
+        const targetModel = (requestedModel === '3.5-lite') ? 'gemini-3.5-flash-lite' : 'gemini-3.6-flash';
+
         const model = genAI.getGenerativeModel({ 
-            model: 'gemini-3.8-flash',
-            systemInstruction: "أنت خبير أمن برمجيات وهندسة سيبرانية وتطوير في Roblox و Luau. قم بتحليل وتشريح الأكواد المرسلة بدقة متناهية سطر بسطر، واكشف الأخطاء الإملائية والمنطقية، والثغرات الأمنية، وقدم السكربت المصحح بالكامل بشكل احترافي وباللغة العربية."
+            model: targetModel,
+            systemInstruction: "أنت خبير أمن برمجيات وهندسة سيبرانية وتطوير في Roblox و Luau. قم بتحليل وتشريح الأكواد والصور والمرئيات المرسلة بدقة متناهية سطر بسطر، واكشف الأخطاء الإملائية والمنطقية، والثغرات الأمنية، وقدم السكربت أو الشرح المصحح بالكامل بشكل احترافي وباللغة العربية."
         });
 
-        const result = await model.generateContent(message);
+        // إعداد مدخلات الذكاء الاصطناعي (نص + صورة إن وجدت)
+        let promptContents = [];
+
+        if (message) {
+            promptContents.push(message);
+        }
+
+        if (image && image.data && image.mimeType) {
+            promptContents.push({
+                inlineData: {
+                    data: image.data,
+                    mimeType: image.mimeType
+                }
+            });
+        }
+
+        if (promptContents.length === 0) {
+            return res.status(400).json({ success: false, error: 'لم يتم تقديم نص أو صورة للتحليل.' });
+        }
+
+        const result = await model.generateContent(promptContents);
         const responseText = result.response.text();
 
         res.json({ success: true, reply: responseText });
@@ -43,7 +62,7 @@ app.post('/api/chat', async (req, res) => {
         console.error('API Error:', error);
         res.status(500).json({ 
             success: false, 
-            error: "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: " + error.message 
+            error: "حدث خطأ أثناء معالجة الطلب: " + error.message 
         });
     }
 });
