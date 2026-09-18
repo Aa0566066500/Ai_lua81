@@ -18,7 +18,6 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ success: false, error: 'الرسالة فارغة' });
         }
 
-        // قراءة المفتاح باسم API_KEY
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
             return res.status(500).json({ 
@@ -28,8 +27,10 @@ app.post('/api/chat', async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
+        
+        // استخدام النموذج المعتمد gemini-2.5-flash
         const model = genAI.getGenerativeModel({ 
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             systemInstruction: "أنت خبير أمن برمجيات وهندسة سيبرانية وتطوير في Roblox و Luau. قم بتحليل وتشريح الأكواد المرسلة بدقة متناهية سطر بسطر، واكشف الأخطاء الإملائية والمنطقية، والثغرات الأمنية، وقدم السكربت المصحح بالكامل بشكل احترافي وباللغة العربية."
         });
 
