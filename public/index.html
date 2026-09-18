@@ -16,15 +16,17 @@
         .sidebar-content label { font-size: 12px; color: #0969da; font-weight: bold; }
         .sidebar-content input, .sidebar-content textarea { width: 100%; background: #f6f8fa; border: 1px solid #d0d7de; color: #24292e; padding: 8px; border-radius: 6px; font-size: 12px; }
         
-        .new-chat-btn { background: #1f883d; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .new-chat-btn:hover { background: #1a7f37; }
+        .new-chat-btn { background: #0969da; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .new-chat-btn:hover { background: #0550ae; }
 
         /* منطقة الدردشة الرئيسية */
         .main-chat-area { flex: 1; display: flex; flex-direction: column; background: #f4f6f9; height: 100vh; position: relative; min-width: 0; }
         
         .chat-header { background: #ffffff; padding: 12px 15px; border-bottom: 1px solid #d0d7de; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .chat-header h2 { font-size: 15px; color: #0969da; }
-        .menu-toggle { background: none; border: none; color: #0969da; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; }
+        
+        .menu-toggle { background: #0969da; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; transition: background 0.2s; }
+        .menu-toggle:hover { background: #0550ae; }
 
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
@@ -32,20 +34,23 @@
         .user-message { background: #0969da; color: white; align-self: flex-start; }
         .ai-message { background: #ffffff; border: 1px solid #d0d7de; color: #24292e; align-self: flex-end; white-space: pre-wrap; font-family: monospace; }
 
-        /* شريط الإدخال السفلي بأيقونات SVG مخصصة */
+        /* شريط الإدخال السفلي وأيقونات بيضاء بخلفيات زرقاء متناسقة */
         .chat-input-area { background: #ffffff; padding: 12px; border-top: 1px solid #d0d7de; display: flex; flex-direction: column; gap: 8px; }
         .file-preview-bar { display: none; align-items: center; justify-content: space-between; background: #f6f8fa; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: 1px solid #0969da; }
         .file-preview-bar span { color: #0969da; font-weight: bold; }
-        .remove-file { background: none; border: none; color: #cf222e; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .remove-file { background: #cf222e; border: none; border-radius: 4px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         .input-box-container { display: flex; align-items: center; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 10px; padding: 8px 12px; gap: 10px; }
         .input-box-container:focus-within { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,0.1); }
         .input-box-container textarea { flex: 1; background: transparent; border: none; color: #24292e; resize: none; height: 24px; max-height: 100px; font-size: 13px; font-family: Tahoma, sans-serif; outline: none; }
         
-        .action-icon-btn { background: transparent; border: none; color: #0969da; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; transition: color 0.2s; }
-        .action-icon-btn:hover { color: #0550ae; }
-        .send-icon-btn { background: #1f883d; border: none; color: white; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .send-icon-btn:hover { background: #1a7f37; }
+        .action-icon-btn { background: #0969da; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; transition: background 0.2s; }
+        .action-icon-btn:hover { background: #0550ae; }
+        
+        /* زر الإرسال بدون لون أخضر (تم تغييره للأزرق الأنيق) */
+        .send-icon-btn { background: #0969da; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .send-icon-btn:hover { background: #0550ae; }
 
         /* التجاوب مع الشاشات الصغيرة */
         @media (max-width: 768px) {
@@ -64,8 +69,8 @@
         <div class="sidebar-header">
             <span>الإعدادات والتحكم</span>
             <button class="action-icon-btn" onclick="toggleSidebar()" title="إغلاق">
-                <!-- SVG Close Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- SVG Close Icon (White) -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -73,8 +78,8 @@
         </div>
         <div class="sidebar-content">
             <button class="new-chat-btn" onclick="clearChat()">
-                <!-- SVG Plus Icon -->
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- SVG Plus Icon (White) -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
@@ -90,8 +95,8 @@
     <div class="main-chat-area">
         <div class="chat-header">
             <button class="menu-toggle" onclick="toggleSidebar()" title="القائمة">
-                <!-- SVG Hamburger Menu Icon -->
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- SVG Hamburger Menu Icon (White) -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -109,8 +114,8 @@
             <div class="file-preview-bar" id="filePreviewBar">
                 <span id="fileName"></span>
                 <button class="remove-file" onclick="removeFile()" title="حذف الملف">
-                    <!-- SVG Small Close Icon -->
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- SVG Small Close Icon (White) -->
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -119,16 +124,16 @@
             <div class="input-box-container">
                 <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect()">
                 <button class="action-icon-btn" onclick="document.getElementById('fileInput').click()" title="إرفاق ملف">
-                    <!-- SVG Plus/Attachment Icon -->
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- SVG Plus/Attachment Icon (White) -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                 </button>
                 <textarea id="messageInput" placeholder="اكتب رسالتك أو الصق الكود هنا..." rows="1" oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
                 <button class="send-icon-btn" onclick="sendMessage()" title="إرسال">
-                    <!-- SVG Send Arrow Icon -->
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- SVG Send Arrow Icon (White) -->
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
