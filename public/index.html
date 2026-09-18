@@ -83,7 +83,6 @@
             align-self: flex-start;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
-            white-space: pre-wrap;
         }
 
         .ai-message {
@@ -97,12 +96,19 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        /* صندوق الكود الاحترافي مع زر النسخ في بداية الصندوق */
+        .ai-message p {
+            margin-bottom: 10px;
+        }
+        .ai-message p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* صندوق الكود باسم lua وزر النسخ في البداية */
         .code-box {
             background-color: #0d1117;
             border: 1px solid #30363d;
             border-radius: 12px;
-            margin: 10px 0;
+            margin: 14px 0;
             overflow: hidden;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
         }
@@ -152,14 +158,21 @@
             white-space: pre;
         }
 
+        /* واجهة منطقة الإدخال والمرفقات (Claude/Kimi Style) */
         #input-container {
             background-color: #0d1117;
             padding: 18px 24px;
             border-top: 1px solid #21262d;
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+        }
+
+        .input-row {
+            display: flex;
             gap: 12px;
             align-items: center;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
         }
 
         #user-input {
@@ -207,6 +220,145 @@
             height: 22px;
         }
 
+        /* بطاقة مرفق الكود قبل الإرسال (Claude / Kimi card) */
+        .attachment-preview {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 320px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: border-color 0.2s;
+        }
+        .attachment-preview:hover {
+            border-color: #58a6ff;
+        }
+        .attachment-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .attachment-icon {
+            background: #21262d;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #58a6ff;
+        }
+        .attachment-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+        .attachment-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #e6edf3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .attachment-size {
+            font-size: 0.75rem;
+            color: #8b949e;
+        }
+        .attachment-close {
+            background: #21262d;
+            border: none;
+            color: #8b949e;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .attachment-close:hover {
+            background: #f85149;
+            color: #fff;
+        }
+
+        /* Modal معاينة الكود قبل الإرسال */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-content {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .modal-header {
+            padding: 16px 20px;
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #58a6ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* زر X بالزاوية العلوية اليمنى (بداخل الإطار وغير ملتصق تماماً بالحافة) */
+        .modal-close-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: #f85149;
+            color: #fff;
+            border-color: #f85149;
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #79c0ff;
+            direction: ltr;
+            text-align: left;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
         .loading-dots span {
             animation: blink 1.4s infinite both;
             height: 8px;
@@ -230,38 +382,120 @@
 
     <div id="chat-container">
         <div class="message ai-message">
-            <div class="code-box">
-                <div class="code-header">
-                    <button class="copy-btn" onclick="copyCode(this)">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        نسخ الكود
-                    </button>
-                    <span>Luau Script</span>
-                </div>
-                <pre class="code-content"><code>-- أهلاً بك يا بطل! اكتب طلبك وسأكتب لك الكود المطلوب فوراً.
-print("Lua AI Ready!")</code></pre>
-            </div>
+            <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. اكتب طلبك أو الصق كوداً لنبدأ العمل!</p>
         </div>
     </div>
 
+    <!-- منطقة الإدخال مع حاوية المرفقات الديناميكية -->
     <div id="input-container">
-        <textarea id="user-input" placeholder="اكتب طلبك البرمجي هنا..."></textarea>
-        <button id="send-btn" title="إرسال">
-            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-        </button>
+        <div id="attachment-container"></div>
+        <div class="input-row">
+            <textarea id="user-input" placeholder="اكتب سؤالك أو الصق كوداً برمجياً هنا..."></textarea>
+            <button id="send-btn" title="إرسال">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal معاينة المرفق قبل الإرسال -->
+    <div id="code-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-title">معاينة الكود المرفق</span>
+                <button class="modal-close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-code-text"></div>
+        </div>
     </div>
 
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const attachmentContainer = document.getElementById('attachment-container');
+        const codeModal = document.getElementById('code-modal');
+        const modalCodeText = document.getElementById('modal-code-text');
+        const modalTitle = document.getElementById('modal-title');
+
+        let currentAttachment = null; // يحفظ الكود المرفق قبل إرساله
+
+        // كشف تلقائي أو لصق لكود برمجي طويل ليتحول إلى مرفق (Claude/Kimi style)
+        userInput.addEventListener('input', () => {
+            const val = userInput.value;
+            // إذا كان النص طويلاً أو يحتوي على أسطر متعددة وكلمات مفتاحية برمجية
+            if (val.length > 80 || (val.includes('\n') && (val.includes('local') || val.includes('function') || val.includes('if') || val.includes('game')))) {
+                if (!currentAttachment) {
+                    createAttachment(val);
+                    userInput.value = ''; // تفريغ حقل الكتابة الرئيسي ووضعه كمرفق
+                }
+            }
+        });
+
+        function createAttachment(content) {
+            const sizeInBytes = new Blob([content]).size;
+            const sizeText = sizeInBytes > 1024 ? (sizeInBytes / 1024).toFixed(1) + ' KB' : sizeInBytes + ' B';
+            const firstLine = content.split('\n')[0].substring(0, 25) + '...';
+
+            currentAttachment = {
+                name: firstLine || 'script.lua',
+                content: content,
+                size: sizeText
+            };
+
+            renderAttachmentPreview();
+        }
+
+        function renderAttachmentPreview() {
+            if (!currentAttachment) {
+                attachmentContainer.innerHTML = '';
+                return;
+            }
+
+            attachmentContainer.innerHTML = `
+                <div class="attachment-preview" onclick="openModal()">
+                    <div class="attachment-info">
+                        <div class="attachment-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <div class="attachment-details">
+                            <span class="attachment-name">${currentAttachment.name}</span>
+                            <span class="attachment-size">TXT ${currentAttachment.size}</span>
+                        </div>
+                    </div>
+                    <button class="attachment-close" onclick="event.stopPropagation(); removeAttachment()">✕</button>
+                </div>
+            `;
+        }
+
+        function removeAttachment() {
+            currentAttachment = null;
+            attachmentContainer.innerHTML = '';
+        }
+
+        function openModal() {
+            if (!currentAttachment) return;
+            modalTitle.textContent = currentAttachment.name;
+            modalCodeText.textContent = currentAttachment.content;
+            codeModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            codeModal.style.display = 'none';
+        }
 
         async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
+            let messageToSend = '';
 
-            appendMessage(text, 'user-message');
-            userInput.value = '';
+            if (currentAttachment) {
+                messageToSend = `[مرفق كود: ${currentAttachment.name}]\n\`\`\`lua\n${currentAttachment.content}\n\`\`\``;
+                removeAttachment();
+            } else {
+                messageToSend = userInput.value.trim();
+                if (!messageToSend) return;
+                userInput.value = '';
+            }
+
+            appendUserMessage(messageToSend);
             
             const loadingId = appendLoadingMessage();
 
@@ -269,14 +503,14 @@ print("Lua AI Ready!")</code></pre>
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ message: messageToSend })
                 });
 
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
 
                 if (data.success) {
-                    appendCodeMessage(data.reply);
+                    appendAIMessageWithTyping(data.reply);
                 } else {
                     appendErrorMsg('خطأ: ' + (data.error || 'حدث مشكلة في السيرفر'));
                 }
@@ -286,12 +520,43 @@ print("Lua AI Ready!")</code></pre>
             }
         }
 
-        function appendMessage(text, className) {
+        function appendUserMessage(text) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${className}`;
-            msgDiv.textContent = text;
+            msgDiv.className = 'message user-message';
+            
+            // إذا كان يحتوي على مرفق كود، نعرضه كبطاقة مرفقة في الشات أيضاً
+            if (text.includes('[مرفق كود:')) {
+                const codeMatch = text.match(/```lua([\s\S]*?)```/);
+                const codeContent = codeMatch ? codeMatch[1].trim() : text;
+                const sizeInBytes = new Blob([codeContent]).size;
+                const sizeText = sizeInBytes > 1024 ? (sizeInBytes / 1024).toFixed(1) + ' KB' : sizeInBytes + ' B';
+
+                msgDiv.innerHTML = `
+                    <div class="attachment-preview" style="cursor:pointer; background:#1158c7; border-color:rgba(255,255,255,0.3);" onclick="openSentModal(this)" data-code="${encodeURIComponent(codeContent)}">
+                        <div class="attachment-info">
+                            <div class="attachment-icon" style="background:#1f6feb; color:#fff;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            </div>
+                            <div class="attachment-details">
+                                <span class="attachment-name" style="color:#fff;">مرفق كود برمجي</span>
+                                <span class="attachment-size" style="color:#e6edf3;">TXT ${sizeText}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                msgDiv.textContent = text;
+            }
+
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function openSentModal(el) {
+            const code = decodeURIComponent(el.getAttribute('data-code'));
+            modalTitle.textContent = "معاينة المرفق المرسل";
+            modalCodeText.textContent = code;
+            codeModal.style.display = 'flex';
         }
 
         function appendErrorMsg(errorText) {
@@ -307,38 +572,85 @@ print("Lua AI Ready!")</code></pre>
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message loading';
             msgDiv.id = 'loading-' + Date.now();
-            msgDiv.innerHTML = 'جاري تنفيذ الطلب <div class="loading-dots"><span></span><span></span><span></span></div>';
+            msgDiv.innerHTML = 'جاري تنفيذ الطلب وتحليل الكود <div class="loading-dots"><span></span><span></span><span></span></div>';
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return msgDiv.id;
         }
 
-        function appendCodeMessage(fullContent) {
+        // أنيميشن الكتابة التدريجي (Typewriter Effect) للذكاء الاصطناعي
+        async function appendAIMessageWithTyping(fullContent) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
-
-            // تنظيف الكود إذا جاء محاطاً بعلامات الـ markdown
-            let cleanCode = fullContent.replace(/```(?:lua)?([\s\S]*?)```/g, '$1').trim();
-
-            const codeBox = document.createElement('div');
-            codeBox.className = 'code-box';
-            codeBox.innerHTML = `
-                <div class="code-header">
-                    <button class="copy-btn" onclick="copyCode(this)">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        نسخ الكود
-                    </button>
-                    <span>Luau Script</span>
-                </div>
-                <pre class="code-content"><code></code></pre>
-            `;
-            
-            // تعبئة الكود بأمان لمنع مشاكل العرض
-            codeBox.querySelector('code').textContent = cleanCode;
-            msgDiv.appendChild(codeBox);
-
             chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // تقسيم الرد إلى نص عادي وأكواد (```lua ... ```)
+            const parts = fullContent.split(/```lua([\s\S]*?)```/g);
+
+            for (let i = 0; i < parts.length; i++) {
+                if (i % 2 === 0) {
+                    // النص العادي يكتب تدريجياً حرفاً بحرف
+                    if (parts[i].trim()) {
+                        const p = document.createElement('p');
+                        msgDiv.appendChild(p);
+                        await typeWriterText(parts[i].trim(), p);
+                    }
+                } else {
+                    // صندوق الكود باسم lua وزر النسخ في البداية
+                    const codeBox = document.createElement('div');
+                    codeBox.className = 'code-box';
+                    codeBox.innerHTML = `
+                        <div class="code-header">
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                نسخ الكود
+                            </button>
+                            <span>lua</span>
+                        </div>
+                        <pre class="code-content"><code></code></pre>
+                    `;
+                    msgDiv.appendChild(codeBox);
+                    const codeElement = codeBox.querySelector('code');
+                    await typeWriterCode(parts[i].trim(), codeElement);
+                }
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // دالة كتابة النص العادي تدريجياً
+        function typeWriterText(text, element) {
+            return new Promise(resolve => {
+                let index = 0;
+                function type() {
+                    if (index < text.length) {
+                        element.textContent += text.charAt(index);
+                        index++;
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        setTimeout(type, 8); // سرعة فائقة وسلسة
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        // دالة كتابة الكود تدريجياً داخل صندوق الكود
+        function typeWriterCode(code, element) {
+            return new Promise(resolve => {
+                let index = 0;
+                function type() {
+                    if (index < code.length) {
+                        element.textContent += code.charAt(index);
+                        index++;
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        setTimeout(type, 4); // سرعة كتابة الكود
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
         }
 
         function copyCode(button) {
