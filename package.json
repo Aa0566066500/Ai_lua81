@@ -1,14 +1,13 @@
 {
   "name": "lua-ai-backend",
   "version": "1.0.0",
-  "description": "Lua AI Pro - Roblox Assistant",
+  "description": "Lua AI Assistant",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.0"
+    "@google/genai": "latest",
+    "express": "^4.19.2"
   }
 }
