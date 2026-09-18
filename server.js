@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -15,21 +14,21 @@ async function askGemini(message) {
   const apiKey = process.env.API_KEY;
   if (!apiKey) throw new Error("API_KEY is missing from Environment Variables.");
 
-  const response = await fetch(
-    "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent)",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey
-      },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: message }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
-      })
-    }
-  );
+  // تم وضع الرابط بشكل صافٍ ومتصل تماماً بدون أي فواصل أو أسطر جديدة
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey
+    },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: "user", parts: [{ text: message }] }],
+      generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
+    })
+  });
 
   const data = await response.json();
   if (!response.ok) {
