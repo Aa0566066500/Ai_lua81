@@ -6,181 +6,200 @@
     <title>مساعد Roblox Studio الذكي</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #0d1117; color: #c9d1d9; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background-color: #0d1117; color: #c9d1d9; height: 100vh; display: flex; overflow: hidden; }
+
+        /* القائمة الجانبية */
+        .sidebar { width: 260px; background: #161b22; border-left: 1px solid #30363d; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid #30363d; font-weight: bold; color: #58a6ff; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-content label { font-size: 12px; color: #8ab4f8; margin-bottom: 3px; }
+        .sidebar-content input, .sidebar-content textarea { width: 100%; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px; border-radius: 6px; font-size: 12px; }
         
-        header { background: #161b22; padding: max(12px, env(safe-area-inset-top)) 15px 12px 15px; text-align: center; border-bottom: 1px solid #30363d; flex-shrink: 0; z-index: 10; }
-        header h1 { font-size: 15px; color: #58a6ff; font-weight: bold; }
+        .new-chat-btn { background: #238636; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; }
+        .new-chat-btn:hover { background: #2ea043; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-
-        .section-box { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; }
-        .section-box h3 { margin-bottom: 8px; color: #8ab4f8; font-size: 14px; }
-
-        textarea, input[type="text"], input[type="file"] { width: 100%; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px; border-radius: 6px; margin-bottom: 8px; resize: vertical; font-family: monospace; font-size: 13px; }
+        /* منطقة الدردشة الرئيسية */
+        .main-chat-area { flex: 1; display: flex; flex-direction: column; background: #0d1117; height: 100vh; position: relative; }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 5px; }
-        button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .btn-green { background: #238636; color: #fff; flex: 1; }
-        .btn-green:hover { background: #2ea043; }
-        .btn-red { background: #da3633; color: #fff; flex: 1; }
-        .btn-red:hover { background: #f85149; }
+        .chat-header { background: #161b22; padding: 12px 15px; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; }
+        .chat-header h2 { font-size: 15px; color: #58a6ff; }
+        .menu-toggle { background: none; border: none; color: #c9d1d9; font-size: 20px; cursor: pointer; display: none; }
 
-        .file-preview { display: flex; align-items: center; justify-content: space-between; background: #21262d; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 12px; border: 1px solid #30363d; }
-        .file-preview span { color: #7ee787; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 85%; }
-        .remove-file-btn { background: transparent; color: #f85149; border: none; font-size: 15px; cursor: pointer; padding: 0 5px; font-weight: bold; }
-        .remove-file-btn:hover { color: #ff7b72; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5; word-break: break-word; }
+        .user-message { background: #1f6feb; color: white; align-self: flex-start; }
+        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; white-space: pre-wrap; font-family: monospace; }
 
-        .output-box { background: #0d1117; border: 1px solid #30363d; padding: 8px; border-radius: 6px; min-height: 60px; white-space: pre-wrap; margin-top: 8px; font-family: monospace; font-size: 12px; color: #e6edf3; }
+        /* شريط الإدخال السفلي */
+        .chat-input-area { background: #161b22; padding: 12px; border-top: 1px solid #30363d; display: flex; flex-direction: column; gap: 8px; }
+        .file-preview-bar { display: flex; align-items: center; justify-content: space-between; background: #21262d; padding: 5px 10px; border-radius: 6px; font-size: 12px; border: 1px solid #30363d; display: none; }
+        .file-preview-bar span { color: #7ee787; }
+        .remove-file { background: none; border: none; color: #f85149; font-weight: bold; cursor: pointer; font-size: 14px; }
+
+        .input-row { display: flex; gap: 8px; align-items: center; }
+        .input-row textarea { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 8px 12px; border-radius: 6px; resize: none; height: 40px; font-size: 13px; font-family: Tahoma, sans-serif; }
+        .icon-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .icon-btn:hover { background: #30363d; }
+        .send-btn { background: #238636; color: white; border: none; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .send-btn:hover { background: #2ea043; }
+
+        /* للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .sidebar { position: absolute; height: 100%; right: -260px; }
+            .sidebar.active { right: 0; }
+            .menu-toggle { display: block; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>مساعد Roblox Studio الذكي (Lua)</h1>
-    </header>
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>الإعدادات والتحكم</span>
+        </div>
+        <div class="sidebar-content">
+            <button class="new-chat-btn" onclick="clearChat()">+ محادثة جديدة</button>
+            <br>
+            <label for="systemInstructionInput">تعليمات النظام (System Instruction):</label>
+            <textarea id="systemInstructionInput" rows="4" placeholder="مثلاً: أنت خبير في برمجة Roblox Lua وتطوير الألعاب...">أنت مساعد ذكي ومحترف في لغة Lua وتطوير ألعاب Roblox Studio.</textarea>
+        </div>
+    </div>
 
-    <div class="main-container">
-        <!-- قسم الدردشة الحرة وتعليمات النظام -->
-        <div class="section-box">
-            <h3>الدردشة الحرة وتعليمات النظام (Chat & System)</h3>
-            <input type="text" id="systemInstruction" placeholder="تعليمات النظام (اختياري، مثلاً: أنت خبير Roblox Lua)...">
-            <input type="file" id="chatFileInput" style="display:none;" onchange="handleFileSelect('chat')">
-            <button onclick="document.getElementById('chatFileInput').click()" style="background:#21262d; border:1px solid #30363d; color:#c9d1d9; width:100%; margin-bottom:8px;">📁 إرفاق ملف للدردشة</button>
-            <div id="chatFileContainer"></div>
-            <textarea id="chatMessage" placeholder="اكتب سؤالك في Lua أو اطلب شيئاً..." rows="3"></textarea>
-            <div class="btn-group">
-                <button class="btn-green" onclick="runChatAction()">إرسال السؤال</button>
-                <button class="btn-red" onclick="clearChat()">حذف الكل</button>
-            </div>
-            <div class="output-box" id="chatOutput">الرد سيظهر هنا...</div>
+    <!-- منطقة الدردشة الرئيسية -->
+    <div class="main-chat-area">
+        <div class="chat-header">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h2>مساعد Roblox Studio الذكي (Lua)</h2>
+            <div style="width: 24px;"></div>
         </div>
 
-        <!-- محرر الكود -->
-        <div class="section-box">
-            <h3>محرر الكود (Code Editor)</h3>
-            <input type="file" id="editorFileInput" style="display:none;" onchange="handleFileSelect('editor')">
-            <button onclick="document.getElementById('editorFileInput').click()" style="background:#21262d; border:1px solid #30363d; color:#c9d1d9; width:100%; margin-bottom:8px;">📁 إرفاق ملف</button>
-            <div id="editorFileContainer"></div>
-            <textarea id="editorCode" placeholder="اكتب أو الصق كود Lua هنا..." rows="3"></textarea>
-            <div class="btn-group">
-                <button class="btn-green" onclick="runEditorAction()">تنفيذ / فحص</button>
-                <button class="btn-red" onclick="clearEditor()">حذف الكل</button>
-            </div>
-            <div class="output-box" id="editorOutput">النتيجة ستظهر هنا...</div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد ورشات Roblox Studio ومراجعتها. كيف يمكنني مساعدتك اليوم؟</div>
         </div>
 
-        <!-- مصحح الأكواد -->
-        <div class="section-box">
-            <h3>مصحح الأكواد (Code Corrector)</h3>
-            <input type="file" id="correctorFileInput" style="display:none;" onchange="handleFileSelect('corrector')">
-            <button onclick="document.getElementById('correctorFileInput').click()" style="background:#21262d; border:1px solid #30363d; color:#c9d1d9; width:100%; margin-bottom:8px;">📁 إرفاق ملف</button>
-            <div id="correctorFileContainer"></div>
-            <textarea id="correctorCode" placeholder="الصق الكود الذي يحتوي على أخطاء هنا..." rows="3"></textarea>
-            <div class="btn-group">
-                <button class="btn-green" onclick="runCorrectorAction()">تصحيح الكود</button>
-                <button class="btn-red" onclick="clearCorrector()">حذف الكل</button>
+        <div class="chat-input-area">
+            <div class="file-preview-bar" id="filePreviewBar">
+                <span id="fileName"></span>
+                <button class="remove-file" onclick="removeFile()">✕</button>
             </div>
-            <div class="output-box" id="correctorOutput">الكود المصحح سيظهر هنا...</div>
+            <div class="input-row">
+                <input type="file" id="fileInput" style="display:none;" onchange="handleFileSelect()">
+                <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="إرفاق ملف">📁</button>
+                <textarea id="messageInput" placeholder="اكتب سؤالك أو الكود هنا..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let uploadedFiles = { chat: null, editor: null, corrector: null };
+        let attachedFile = null;
 
-        function handleFileSelect(type) {
-            const fileInput = document.getElementById(type + 'FileInput');
-            const container = document.getElementById(type + 'FileContainer');
-            if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function handleFileSelect() {
+            const input = document.getElementById('fileInput');
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    uploadedFiles[type] = {
+                    attachedFile = {
                         name: file.name,
                         data: e.target.result.split(',')[1],
                         mimeType: file.type || 'text/plain'
                     };
-                    container.innerHTML = `
-                        <div class="file-preview">
-                            <span>📄 ${file.name}</span>
-                            <button class="remove-file-btn" onclick="removeFile('${type}')">✕</button>
-                        </div>
-                    `;
+                    document.getElementById('fileName').innerText = '📄 ' + file.name;
+                    document.getElementById('filePreviewBar').style.display = 'flex';
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function removeFile(type) {
-            uploadedFiles[type] = null;
-            document.getElementById(type + 'FileInput').value = '';
-            document.getElementById(type + 'FileContainer').innerHTML = '';
+        function removeFile() {
+            attachedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreviewBar').style.display = 'none';
         }
 
         function clearChat() {
-            document.getElementById('chatMessage').value = '';
-            document.getElementById('systemInstruction').value = '';
-            removeFile('chat');
-            document.getElementById('chatOutput').innerText = 'الرد سيظهر هنا...';
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message ai-message">أهلاً بك! أنا جاهز لمساعدتك في أكواد ورشات Roblox Studio ومراجعتها. كيف يمكنني مساعدتك اليوم؟</div>
+            `;
+            removeFile();
         }
 
-        function clearEditor() {
-            document.getElementById('editorCode').value = '';
-            removeFile('editor');
-            document.getElementById('editorOutput').innerText = 'النتيجة ستظهر هنا...';
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
 
-        function clearCorrector() {
-            document.getElementById('correctorCode').value = '';
-            removeFile('corrector');
-            document.getElementById('correctorOutput').innerText = 'الكود المصحح سيظهر هنا...';
-        }
+        async function sendMessage() {
+            const inputEl = document.getElementById('messageInput');
+            const message = inputEl.value.trim();
+            const systemInstruction = document.getElementById('systemInstructionInput').value;
 
-        async function sendRequest(prompt, imageObj, systemInst, outputId) {
-            const outputEl = document.getElementById(outputId);
-            outputEl.innerText = 'جاري المعالجة...';
+            if (!message && !attachedFile) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // عرض رسالة المستخدم
+            let userDisplay = message;
+            if (attachedFile) {
+                userDisplay += `\n[ملف مرفق: ${attachedFile.name}]`;
+            }
+            
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user-message';
+            userDiv.innerText = userDisplay;
+            chatMessages.appendChild(userDiv);
+
+            inputEl.value = '';
+            const currentFile = attachedFile;
+            removeFile();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // إضافة رسالة "جاري الكتابة..."
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai-message';
+            loadingDiv.innerText = 'جاري المعالجة...';
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
             try {
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: prompt, image: imageObj, systemInstruction: systemInst })
+                    body: JSON.stringify({
+                        message: message || "قم بتحليل الملف المرفق",
+                        image: currentFile,
+                        systemInstruction: systemInstruction
+                    })
                 });
+
                 const data = await res.json();
+                chatMessages.removeChild(loadingDiv);
+
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'message ai-message';
                 if (data.success) {
-                    outputEl.innerText = data.reply;
+                    aiDiv.innerText = data.reply;
                 } else {
-                    outputEl.innerText = 'خطأ: ' + data.error;
+                    aiDiv.innerText = 'خطأ: ' + data.error;
                 }
+                chatMessages.appendChild(aiDiv);
             } catch (err) {
-                outputEl.innerText = 'حدث خطأ في الاتصال بالخادم.';
+                chatMessages.removeChild(loadingDiv);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message ai-message';
+                errorDiv.innerText = 'حدث خطأ في الاتصال بالخادم.';
+                chatMessages.appendChild(errorDiv);
             }
-        }
-
-        function runChatAction() {
-            const message = document.getElementById('chatMessage').value;
-            const systemInst = document.getElementById('systemInstruction').value;
-            if (!message && !uploadedFiles.chat) {
-                alert('الرجاء كتابة رسالة أو إرفاق ملف أولاً.');
-                return;
-            }
-            sendRequest(message || "تحليل الملف المرفق", uploadedFiles.chat, systemInst, 'chatOutput');
-        }
-
-        function runEditorAction() {
-            const code = document.getElementById('editorCode').value;
-            if (!code && !uploadedFiles.editor) {
-                alert('الرجاء كتابة كود أو إرفاق ملف أولاً.');
-                return;
-            }
-            sendRequest("قم بمراجعة وتحليل كود Roblox Lua التالي:\n" + code, uploadedFiles.editor, "أنت خبير محترف في برمجة Roblox Lua وتطوير الألعاب.", 'editorOutput');
-        }
-
-        function runCorrectorAction() {
-            const code = document.getElementById('correctorCode').value;
-            if (!code && !uploadedFiles.corrector) {
-                alert('الرجاء كتابة كود أو إرفاق ملف للتصحيح.');
-                return;
-            }
-            sendRequest("قم بتصحيح الأخطاء البرمجية في كود Roblox Lua التالي وإرجاع الكود الصحيح فقط مع شرح بسيط:\n" + code, uploadedFiles.corrector, "أنت خبير في تصحيح أكواد Roblox Lua وإصلاح الأخطاء بدقة.", 'correctorOutput');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     </script>
 </body>
