@@ -12,7 +12,10 @@ app.post('/api/chat', async (req, res) => {
     try {
         const { message, model, image, systemInstruction } = req.body;
         
-        let modelsToTry = model === '3.5-lite' ? ['gemini-3.5-flash-lite', 'gemini-2.5-flash'] : ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+        // استخدام الموديلات الحديثة فقط وتجنب النماذج القديمة
+        let modelsToTry = model === '3.5-lite' 
+            ? ['gemini-3.5-flash-lite', 'gemini-3.6-flash'] 
+            : ['gemini-3.6-flash', 'gemini-3.5-flash'];
 
         let responseText = null;
         let lastError = null;
