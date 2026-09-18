@@ -18,11 +18,12 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ success: false, error: 'الرسالة فارغة' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        // قراءة المفتاح باسم API_KEY
+        const apiKey = process.env.API_KEY;
         if (!apiKey) {
             return res.status(500).json({ 
                 success: false, 
-                error: 'مفتاح GEMINI_API_KEY غير مضاف في Environment Variables داخل Render.' 
+                error: 'مفتاح API_KEY غير مضاف في Environment Variables داخل Render.' 
             });
         }
 
