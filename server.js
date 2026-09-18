@@ -1,18 +1,19 @@
-const express = require("express");
+const express = "express";
+const expressApp = require("express");
 const cors = require("cors");
 
-const app = express();
+const app = expressApp();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.static("public"));
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "2mb" }));
 
-const systemPrompt = `أنت مساعد برمجة متخصص في Roblox Studio و Luau. مهمتك الوحيدة هي كتابة كود Luau نظيف، مرتب، ومحترف بناءً على طلب المستخدم.
-قواعد صارمة جداً:
-1. اكتب الكود البرمجي فقط لا غير داخل صندوق الكود \`\`\`lua ... \`\`\`.
-2. ممنوع نهائياً كتابة أي شرح، كلام، مقدمات، أو خاتمة خارج صندوق الكود.
-3. اكتب الكود كاملاً ومفصلاً وبدون أي اختصار أو عبارات مثل "أكمل بنفسك".`;
+const systemPrompt = `أنت مساعد برمجة ذكي ومتخصص في Roblox Studio و Luau. 
+قواعد الرد:
+1. عندما تحتاج لكتابة كود برمجي، ضعه حصرياً داخل صناديق الأكواد بالصيغة \`\`\`lua ... \`\`\`.
+2. الشرح الكلامي، التحليل، والمقدمات أو الخاتمة يجب أن تكتب كنصوص عادية خارج صناديق الأكواد وبشكل مرتب وجميل.
+3. كن دقيقاً جداً في تحليل الأكواد المرسلة من المستخدم واشرحها أو عدلها باحترافية.`;
 
 async function askGemini(message) {
   const apiKey = process.env.API_KEY;
@@ -29,7 +30,7 @@ async function askGemini(message) {
     body: JSON.stringify({
       system_instruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role: "user", parts: [{ text: message }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+      generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
     })
   });
 
