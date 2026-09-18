@@ -63,13 +63,12 @@
         }
 
         .message {
-            max-width: 85%;
-            padding: 16px 20px;
+            max-width: 88%;
+            padding: 18px 22px;
             border-radius: 16px;
-            line-height: 1.7;
+            line-height: 1.8;
             word-wrap: break-word;
-            white-space: pre-wrap;
-            font-size: 0.95rem;
+            font-size: 0.98rem;
             animation: fadeIn 0.3s ease-in-out;
         }
 
@@ -84,6 +83,7 @@
             align-self: flex-start;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
+            white-space: pre-wrap;
         }
 
         .ai-message {
@@ -92,9 +92,16 @@
             color: #e6edf3;
             align-self: flex-end;
             border-bottom-left-radius: 4px;
-            width: 92%;
-            max-width: 950px;
+            width: 94%;
+            max-width: 1000px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .ai-message p {
+            margin-bottom: 10px;
+        }
+        .ai-message p:last-child {
+            margin-bottom: 0;
         }
 
         /* اقتراحات ذكية */
@@ -102,8 +109,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 14px;
-            padding-top: 12px;
+            margin-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid #21262d;
         }
 
@@ -111,9 +118,9 @@
             background-color: #21262d;
             color: #58a6ff;
             border: 1px solid #30363d;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 15px;
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -125,24 +132,24 @@
             transform: translateY(-2px);
         }
 
-        /* صندوق الكود */
+        /* صندوق الكود الاحترافي */
         .code-box {
             background-color: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            margin: 14px 0;
+            border-radius: 12px;
+            margin: 16px 0;
             overflow: hidden;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
         }
 
         .code-header {
             background-color: #161b22;
-            padding: 10px 14px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #30363d;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: #8b949e;
             font-family: monospace;
         }
@@ -151,31 +158,33 @@
             background: #21262d;
             border: 1px solid #30363d;
             color: #c9d1d9;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-family: 'Tajawal', sans-serif;
             transition: all 0.2s;
         }
 
         .copy-btn:hover {
-            background-color: #30363d;
+            background-color: #1f6feb;
             color: #ffffff;
+            border-color: #1f6feb;
         }
 
         .code-content {
-            padding: 14px;
+            padding: 16px;
             overflow-x: auto;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             color: #79c0ff;
             direction: ltr;
             text-align: left;
-            line-height: 1.5;
+            line-height: 1.6;
+            white-space: pre;
         }
 
         #input-container {
@@ -195,7 +204,7 @@
             border-radius: 12px;
             padding: 12px 18px;
             color: #e6edf3;
-            font-size: 0.95rem;
+            font-size: 0.98rem;
             outline: none;
             resize: none;
             height: 50px;
@@ -256,12 +265,12 @@
 
     <div id="chat-container">
         <div class="message ai-message">
-            أهلاً بك يا بطل! أنا مساعدك الذكي المخصص لـ Roblox Studio و Luau. اكتب سؤالك أو اطلب نظاماً كاملاً لنبدأ العمل!
+            <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. اكتب طلبك وسأقوم بشرح الفكرة وتحليلها بدقة وتجهيز الكود في صندوق احترافي مع زر نسخ.</p>
         </div>
     </div>
 
     <div id="input-container">
-        <textarea id="user-input" placeholder="اكتب سؤالك أو اطلب كوداً برمجياً..."></textarea>
+        <textarea id="user-input" placeholder="اكتب سؤالك أو اطلب نظاماً برمجياً..."></textarea>
         <button id="send-btn" title="إرسال">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
         </button>
@@ -314,7 +323,7 @@
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message loading';
             msgDiv.id = 'loading-' + Date.now();
-            msgDiv.innerHTML = 'جاري التفكير وصياغة الكود <div class="loading-dots"><span></span><span></span><span></span></div>';
+            msgDiv.innerHTML = 'جاري تحليل الطلب وكتابة الكود بدقة <div class="loading-dots"><span></span><span></span><span></span></div>';
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return msgDiv.id;
@@ -327,33 +336,35 @@
             let mainText = fullContent;
             let suggestions = [];
 
-            // استخراج الاقتراحات إذا وجدت
+            // استخراج المقترحات إن وجدت في النهاية
             const sugMatch = fullContent.match(/[SUGGESTIONS]([\s\S]*?)(?:$)/);
             if (sugMatch) {
                 suggestions = sugMatch[1].split('|').map(s => s.trim()).filter(Boolean);
                 mainText = fullContent.replace(sugMatch[0], '').trim();
             }
 
-            // تقسيم الأكواد
-            const parts = mainText.split(/```lua([\s\S]*?)```/g);
+            // فصل النص العادي عن الأكواد البرمجية (يدعم ```lua و ```)
+            const parts = mainText.split(/```(?:lua)?([\s\S]*?)```/g);
 
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 0) {
+                    // النص العادي يكتب بشكل طبيعي ومرتب
                     if (parts[i].trim()) {
-                        const p = document.createElement('div');
+                        const p = document.createElement('p');
                         p.textContent = parts[i].trim();
                         msgDiv.appendChild(p);
                     }
                 } else {
+                    // الكود البرمجي وحده في صندوق الكود الاحترافي مع زر النسخ في البداية
                     const codeBox = document.createElement('div');
                     codeBox.className = 'code-box';
                     codeBox.innerHTML = `
                         <div class="code-header">
-                            <span>lua (Luau Script)</span>
                             <button class="copy-btn" onclick="copyCode(this)">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 نسخ الكود
                             </button>
+                            <span>Luau Script</span>
                         </div>
                         <pre class="code-content"><code>${parts[i].trim()}</code></pre>
                     `;
@@ -361,7 +372,7 @@
                 }
             }
 
-            // إضافة أزرار الاقتراحات التفاعلية إن وجدت
+            // إضافة الاقتراحات الذكية أسفل الرد
             if (suggestions.length > 0) {
                 const sugContainer = document.createElement('div');
                 sugContainer.className = 'suggestions-container';
