@@ -9,23 +9,14 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(express.json({ limit: "1mb" }));
 
-const systemPrompt = `
-أنت LUA AI، مساعد ذكاء اصطناعي متقدم ومتخصص في Roblox Studio وLuau وتصميم وتطوير ألعاب Roblox وواجهات المستخدم الاحترافية.
-هدفك هو تحويل طلب المستخدم إلى نتيجة احترافية، منظمة، متناسقة، عملية، جميلة، آمنة، وقابلة للتوسع.
-
-قواعد الإجابة:
-1. اكتب أكواد Luau كاملة ونظيفة داخل ```lua ... ``` حصرياً بدون أي اختصار.
-2. افصل بوضوح تام بين Client و Server واشرح الحل باختصار ووضوح.
-3. في نهاية كل رد، يجب أن تقترح 3 خطوات أو أسئلة تالية للمطور، وضعها تماماً في نهاية الرد بهذا الشكل الصارم:
-[SUGGESTIONS] السؤال الأول المقترح | السؤال الثاني المقترح | السؤال الثالث المقترح
-`.trim();
+const systemPrompt = "أنت LUA AI، مساعد ذكاء اصطناعي متقدم ومتخصص في Roblox Studio وLuau وتصميم وتطوير ألعاب Roblox وواجهات المستخدم الاحترافية. هدفك هو تحويل طلب المستخدم إلى نتيجة احترافية، منظمة، متناسقة، عملية، جميلة، آمنة، وقابلة للتوسع.\n\nقواعد الإجابة:\n1. اكتب أكواد Luau كاملة ونظيفة داخل صناديق الأكواد حصرياً بدون أي اختصار.\n2. افصل بوضوح تام بين Client و Server واشرح الحل باختصار ووضوح.\n3. في نهاية كل رد، يجب أن تقترح 3 خطوات أو أسئلة تالية للمطور، وضعها تماماً في نهاية الرد بهذا الشكل الصارم:\n[SUGGESTIONS] السؤال الأول المقترح | السؤال الثاني المقترح | السؤال الثالث المقترح";
 
 async function askGemini(message) {
   const apiKey = process.env.API_KEY;
   if (!apiKey) throw new Error("API_KEY is missing from Environment Variables.");
 
   const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+    "[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent)",
     {
       method: "POST",
       headers: {
