@@ -12,9 +12,7 @@ app.post('/api/chat', async (req, res) => {
     try {
         const { message, image, systemInstruction } = req.body;
         
-        // الالتزام التام بالموديلات 3.5 و 3.6 فقط
         let modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash'];
-
         let responseText = null;
         let lastError = null;
 
