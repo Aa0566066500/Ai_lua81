@@ -6,476 +6,78 @@
     <title>Lua AI Pro - Roblox Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: #07090f; color: #e6edf3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        button, .chat-item, .file-drop-box, .sidebar-nav-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        button:active, .chat-item:active, .sidebar-nav-item:active { transform: scale(0.97); }
 
-        body {
-            background-color: #07090f;
-            color: #e6edf3;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
+        header { background-color: #0d1117; padding: 16px 24px; border-bottom: 1px solid #21262d; font-size: 1.25rem; font-weight: 700; color: #58a6ff; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 10; }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: #58a6ff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; }
+        .menu-btn:hover { background: rgba(88, 166, 255, 0.1); }
+        .header-badge { font-size: 0.75rem; background: rgba(88, 166, 255, 0.1); color: #58a6ff; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(88, 166, 255, 0.3); }
 
-        button, .chat-item, .file-drop-box, .sidebar-nav-item {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        button:active, .chat-item:active, .sidebar-nav-item:active {
-            transform: scale(0.97);
-        }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 100; display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+        .sidebar { position: fixed; top: 0; right: -380px; width: 360px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -15px 0 40px rgba(0,0,0,0.6); overflow-y: auto; }
+        .sidebar.active { right: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem; color: #58a6ff; }
+        .sidebar-close { background: #21262d; border: none; color: #c9d1d9; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .sidebar-close:hover { background: #f85149; color: #fff; }
 
-        header {
-            background-color: #0d1117;
-            padding: 16px 24px;
-            border-bottom: 1px solid #21262d;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #58a6ff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            z-index: 10;
-        }
+        .sidebar-section { padding: 20px; border-bottom: 1px solid #21262d; }
+        .sidebar-section h3 { font-size: 0.9rem; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .sidebar-nav-item { background: #161b22; border: 1px solid #30363d; padding: 12px 16px; border-radius: 10px; color: #58a6ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.95rem; }
+        .sidebar-nav-item:hover { background: #1f242c; border-color: #58a6ff; }
 
-        .menu-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #58a6ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px;
-            border-radius: 8px;
-        }
-        .menu-btn:hover {
-            background: rgba(88, 166, 255, 0.1);
-        }
+        .chat-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+        .chat-item { background: #161b22; border: 1px solid #30363d; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; cursor: pointer; }
+        .chat-item:hover { border-color: #58a6ff; }
+        .chat-item span { color: #e6edf3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 75%; }
+        .chat-actions { display: flex; gap: 6px; }
+        .chat-action-btn { background: none; border: none; color: #8b949e; cursor: pointer; padding: 4px; border-radius: 4px; }
+        .chat-action-btn:hover { color: #58a6ff; background: #21262d; }
 
-        .header-badge {
-            font-size: 0.75rem;
-            background: rgba(88, 166, 255, 0.1);
-            color: #58a6ff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(88, 166, 255, 0.3);
-        }
+        .app-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .hidden-view { display: none !important; }
 
-        .sidebar-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0; right: -380px; width: 360px; height: 100%;
-            background-color: #0d1117;
-            border-left: 1px solid #30363d;
-            z-index: 101;
-            display: flex;
-            flex-direction: column;
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -15px 0 40px rgba(0,0,0,0.6);
-            overflow-y: auto;
-        }
-        .sidebar.active {
-            right: 0;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid #21262d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #58a6ff;
-        }
-
-        .sidebar-close {
-            background: #21262d;
-            border: none;
-            color: #c9d1d9;
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .sidebar-close:hover {
-            background: #f85149;
-            color: #fff;
-        }
-
-        .sidebar-section {
-            padding: 20px;
-            border-bottom: 1px solid #21262d;
-        }
-
-        .sidebar-section h3 {
-            font-size: 0.9rem;
-            color: #8b949e;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-nav-item {
-            background: #161b22;
-            border: 1px solid #30363d;
-            padding: 12px 16px;
-            border-radius: 10px;
-            color: #58a6ff;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-        .sidebar-nav-item:hover {
-            background: #1f242c;
-            border-color: #58a6ff;
-        }
-
-        .chat-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 280px;
-            overflow-y: auto;
-        }
-        .chat-item {
-            background: #161b22;
-            border: 1px solid #30363d;
-            padding: 10px 14px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .chat-item:hover {
-            border-color: #58a6ff;
-        }
-        .chat-item span {
-            color: #e6edf3;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 75%;
-        }
-        .chat-actions {
-            display: flex;
-            gap: 6px;
-        }
-        .chat-action-btn {
-            background: none;
-            border: none;
-            color: #8b949e;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-        }
-        .chat-action-btn:hover {
-            color: #58a6ff;
-            background: #21262d;
-        }
-
-        .app-view {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .hidden-view {
-            display: none !important;
-        }
-
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
-        }
+        #chat-container { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
         #chat-container::-webkit-scrollbar { width: 6px; }
         #chat-container::-webkit-scrollbar-thumb { background: #21262d; border-radius: 10px; }
 
-        .message {
-            max-width: 88%;
-            padding: 18px 22px;
-            border-radius: 16px;
-            line-height: 1.8;
-            word-wrap: break-word;
-            font-size: 0.98rem;
-            animation: fadeIn 0.3s ease-in-out;
-        }
+        .message { max-width: 88%; padding: 18px 22px; border-radius: 16px; line-height: 1.8; word-wrap: break-word; font-size: 0.98rem; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user-message { background: linear-gradient(135deg, #1f6feb, #1158c7); color: #ffffff; align-self: flex-start; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2); }
+        .ai-message { background-color: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; border-bottom-left-radius: 4px; width: 94%; max-width: 1000px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .code-box { background-color: #0d1117; border: 1px solid #30363d; border-radius: 12px; margin: 14px 0; overflow: hidden; }
+        .code-header { background-color: #161b22; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; font-size: 0.82rem; color: #8b949e; }
+        .copy-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; }
+        .copy-btn:hover { background-color: #1f6feb; color: #ffffff; }
+        .code-content { padding: 16px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; color: #79c0ff; direction: ltr; text-align: left; line-height: 1.6; white-space: pre; }
 
-        .user-message {
-            background: linear-gradient(135deg, #1f6feb, #1158c7);
-            color: #ffffff;
-            align-self: flex-start;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
-        }
+        .editor-workspace { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background-color: #07090f; }
+        .editor-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media(max-width: 900px) { .editor-container-grid { grid-template-columns: 1fr; } }
+        
+        .editor-card { background: #111620; border: 1px solid #30363d; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .editor-card label { font-size: 0.85rem; color: #8b949e; font-weight: 700; }
+        .editor-card textarea { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; color: #79c0ff; font-family: monospace; font-size: 0.9rem; padding: 14px; height: 180px; resize: none; outline: none; direction: ltr; text-align: left; }
+        .editor-card textarea:focus { border-color: #58a6ff; }
 
-        .ai-message {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            color: #e6edf3;
-            align-self: flex-end;
-            border-bottom-left-radius: 4px;
-            width: 94%;
-            max-width: 1000px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
+        .file-drop-box { background: #161b22; border: 1px dashed #30363d; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; font-size: 0.88rem; color: #8b949e; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .file-drop-box:hover { border-color: #58a6ff; color: #58a6ff; }
+        
+        .action-main-btn { background: linear-gradient(135deg, #238636, #2ea043); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3); }
 
-        .code-box {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            margin: 14px 0;
-            overflow: hidden;
-        }
+        .large-output-box { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 18px; font-family: monospace; font-size: 0.92rem; height: 260px; overflow-y: auto; direction: ltr; text-align: left; color: #79c0ff; white-space: pre-wrap; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
 
-        .code-header {
-            background-color: #161b22;
-            padding: 10px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #30363d;
-            font-size: 0.82rem;
-            color: #8b949e;
-        }
-
-        .copy-btn {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.82rem;
-            font-weight: 600;
-        }
-        .copy-btn:hover {
-            background-color: #1f6feb;
-            color: #ffffff;
-        }
-
-        .code-content {
-            padding: 16px;
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            color: #79c0ff;
-            direction: ltr;
-            text-align: left;
-            line-height: 1.6;
-            white-space: pre;
-        }
-
-        .editor-workspace {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            background-color: #07090f;
-        }
-        .editor-container-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        @media(max-width: 900px) {
-            .editor-container-grid { grid-template-columns: 1fr; }
-        }
-        .editor-card {
-            background: #111620;
-            border: 1px solid #30363d;
-            border-radius: 14px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        .editor-card label {
-            font-size: 0.85rem;
-            color: #8b949e;
-            font-weight: 700;
-        }
-        .editor-card textarea {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 10px;
-            color: #79c0ff;
-            font-family: monospace;
-            font-size: 0.9rem;
-            padding: 14px;
-            height: 180px;
-            resize: none;
-            outline: none;
-            direction: ltr;
-            text-align: left;
-        }
-        .editor-card textarea:focus {
-            border-color: #58a6ff;
-        }
-
-        .file-drop-box {
-            background: #161b22;
-            border: 1px dashed #30363d;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.88rem;
-            color: #8b949e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .file-drop-box:hover {
-            border-color: #58a6ff;
-            color: #58a6ff;
-        }
-
-        .action-main-btn {
-            background: linear-gradient(135deg, #238636, #2ea043);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
-        }
-
-        .large-output-box {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 18px;
-            font-family: monospace;
-            font-size: 0.92rem;
-            height: 260px;
-            overflow-y: auto;
-            direction: ltr;
-            text-align: left;
-            color: #79c0ff;
-            white-space: pre-wrap;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        #input-container {
-            background-color: #0d1117;
-            padding: 18px 24px;
-            border-top: 1px solid #21262d;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        #user-input {
-            flex: 1;
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #e6edf3;
-            font-size: 0.98rem;
-            outline: none;
-            resize: none;
-            height: 50px;
-            max-height: 130px;
-        }
-
-        #send-btn {
-            background: linear-gradient(135deg, #238636, #2ea043);
-            border: none;
-            border-radius: 12px;
-            width: 50px; height: 50px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
-        }
+        #input-container { background-color: #0d1117; padding: 18px 24px; border-top: 1px solid #21262d; display: flex; flex-direction: column; gap: 12px; }
+        .input-row { display: flex; gap: 12px; align-items: center; }
+        #user-input { flex: 1; background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 12px 18px; color: #e6edf3; font-size: 0.98rem; outline: none; resize: none; height: 50px; max-height: 130px; }
+        #send-btn { background: linear-gradient(135deg, #238636, #2ea043); border: none; border-radius: 12px; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3); }
         #send-btn svg { fill: #ffffff; width: 22px; height: 22px; }
-
-        .attachment-preview {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 320px;
-            cursor: pointer;
-        }
-        .attachment-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
-        .attachment-icon { background: #21262d; border-radius: 8px; padding: 8px; color: #58a6ff; }
-        .attachment-details { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
-        .attachment-name { font-size: 0.88rem; font-weight: 700; color: #e6edf3; }
-        .attachment-size { font-size: 0.75rem; color: #8b949e; }
-        .attachment-close { background: #21262d; border: none; color: #8b949e; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
-        }
-        .modal-content {
-            background-color: #0d1117; border: 1px solid #30363d; border-radius: 16px; width: 100%; max-width: 650px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
-        }
-        .modal-header { padding: 16px 20px; background-color: #161b22; border-bottom: 1px solid #30363d; font-weight: 700; font-size: 1rem; color: #58a6ff; display: flex; justify-content: space-between; align-items: center; }
-        .modal-close-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
-        .modal-body { padding: 20px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; color: #79c0ff; direction: ltr; text-align: left; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -484,12 +86,10 @@
         <div class="header-left">
             <button class="menu-btn" id="menuToggleBtn" title="القائمة">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
-            <span id="headerTitle">Lua AI Pro - الدردشة</span>
+            <span id="headerTitle">Lua AI Pro - الدردشات</span>
         </div>
         <span class="header-badge">Roblox Expert</span>
     </header>
@@ -503,7 +103,6 @@
 
         <div class="sidebar-section">
             <h3>الأدوات الرئيسية</h3>
-            <!-- الترتيب المطلوب: الدردشات أولاً، محرر كود ثانياً، مصحح الكود ثالثاً -->
             <div class="sidebar-nav-item" id="openChatNavBtn" style="color: #3fb950;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 الدردشات
@@ -524,16 +123,14 @@
         </div>
     </div>
 
-    <!-- نافذة الدردشة -->
+    <!-- نافذة الدردشات -->
     <div id="chatView" class="app-view">
         <div id="chat-container">
             <div class="message ai-message">
                 <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. افتح القائمة الجانبية للتنقل بين الدردشات، محرر الكود، ومصحح الكود.</p>
             </div>
         </div>
-
         <div id="input-container">
-            <div id="attachment-container"></div>
             <div class="input-row">
                 <textarea id="user-input" placeholder="اكتب سؤالك أو الصق كوداً برمجياً هنا..."></textarea>
                 <button id="send-btn" title="إرسال">
@@ -543,7 +140,7 @@
         </div>
     </div>
 
-    <!-- واجهة محرر كود المستقلة -->
+    <!-- نافذة محرر الأكواد -->
     <div id="editorView" class="app-view hidden-view">
         <div class="editor-workspace">
             <div class="editor-card" style="flex: 1;">
@@ -553,7 +150,7 @@
         </div>
     </div>
 
-    <!-- واجهة مصحح الكود المستقلة (الفحص والتشريح الحقيقي بالذكاء الاصطناعي) -->
+    <!-- نافذة مصحح الكود (تحليل الذكاء الاصطناعي الحقيقي) -->
     <div id="correctorView" class="app-view hidden-view">
         <div class="editor-workspace">
             <div class="editor-container-grid">
@@ -565,10 +162,10 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         أو رفع ملف كود (.lua / .txt)
                     </div>
-                    <button class="action-main-btn" id="runRealCorrectorBtn">فحص وتحليل الأخطاء بالذكاء الاصطناعي</button>
+                    <button class="action-main-btn" id="runRealCorrectorBtn">فحص وتحليل الأخطاء</button>
                 </div>
                 <div class="editor-card">
-                    <label>تقرير التحليل والتصحيح الحقيقي</label>
+                    <label>تقرير التحليل والتصحيح (نتائج الذكاء الاصطناعي)</label>
                     <div class="large-output-box" id="correctorOutputBox">
                         <span style="color: #8b949e;">في انتظار إدخال الكود لبدء الفحص العميق وتحليل الأخطاء...</span>
                     </div>
@@ -577,291 +174,86 @@
         </div>
     </div>
 
-    <div id="code-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="modal-title">معاينة الكود المرفق</span>
-                <button class="modal-close-btn" onclick="closeModal()">✕</button>
-            </div>
-            <div class="modal-body" id="modal-code-text"></div>
-        </div>
-    </div>
-
     <script>
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const attachmentContainer = document.getElementById('attachment-container');
-        const codeModal = document.getElementById('code-modal');
-        const modalCodeText = document.getElementById('modal-code-text');
-        const modalTitle = document.getElementById('modal-title');
-
+        // المتغيرات وعناصر الواجهة
         const menuToggleBtn = document.getElementById('menuToggleBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-
-        const chatView = document.getElementById('chatView');
-        const editorView = document.getElementById('editorView');
-        const correctorView = document.getElementById('correctorView');
 
         const openChatNavBtn = document.getElementById('openChatNavBtn');
         const openEditorNavBtn = document.getElementById('openEditorNavBtn');
         const openCorrectorNavBtn = document.getElementById('openCorrectorNavBtn');
         const headerTitle = document.getElementById('headerTitle');
 
-        const correctorCodeInput = document.getElementById('correctorCodeInput');
-        const correctorFileInput = document.getElementById('correctorFileInput');
-        const correctorFileDropTrigger = document.getElementById('correctorFileDropTrigger');
-        const runRealCorrectorBtn = document.getElementById('runRealCorrectorBtn');
-        const correctorOutputBox = document.getElementById('correctorOutputBox');
+        const chatView = document.getElementById('chatView');
+        const editorView = document.getElementById('editorView');
+        const correctorView = document.getElementById('correctorView');
+
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
         const chatListContainer = document.getElementById('chatListContainer');
 
-        let currentAttachment = null;
+        const correctorCodeInput = document.getElementById('correctorCodeInput');
+        const runRealCorrectorBtn = document.getElementById('runRealCorrectorBtn');
+        const correctorOutputBox = document.getElementById('correctorOutputBox');
+        const correctorFileDropTrigger = document.getElementById('correctorFileDropTrigger');
+        const correctorFileInput = document.getElementById('correctorFileInput');
+
         let chats = JSON.parse(localStorage.getItem('lua_chats_v3') || '[]');
 
-        let userScrolledUpChat = false;
-        let userScrolledUpOutput = false;
+        // فتح وإغلاق القائمة الجانبية
+        menuToggleBtn.onclick = () => { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); renderChatList(); };
+        function closeSidebar() { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); }
+        sidebarCloseBtn.onclick = closeSidebar; sidebarOverlay.onclick = closeSidebar;
 
-        chatContainer.addEventListener('scroll', () => {
-            const threshold = 60;
-            const pos = chatContainer.scrollTop + chatContainer.clientHeight;
-            userScrolledUpChat = (chatContainer.scrollHeight - pos > threshold);
-        });
-
-        correctorOutputBox.addEventListener('scroll', () => {
-            const threshold = 60;
-            const pos = correctorOutputBox.scrollTop + correctorOutputBox.clientHeight;
-            userScrolledUpOutput = (correctorOutputBox.scrollHeight - pos > threshold);
-        });
-
-        function scrollToBottomChat(force = false) {
-            if (!userScrolledUpChat || force) {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        }
-
-        function scrollToBottomOutput() {
-            if (!userScrolledUpOutput) {
-                correctorOutputBox.scrollTop = correctorOutputBox.scrollHeight;
-            }
-        }
-
-        menuToggleBtn.onclick = () => {
-            sidebar.classList.add('active');
-            sidebarOverlay.classList.add('active');
-            renderChatList();
-        };
-
-        function closeSidebar() {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-        }
-        sidebarCloseBtn.onclick = closeSidebar;
-        sidebarOverlay.onclick = closeSidebar;
-
-        // التنقل بين الواجهات وإغلاق القائمة تلقائياً
+        // التنقل بين الشاشات
         openChatNavBtn.onclick = () => {
-            closeSidebar();
-            editorView.classList.add('hidden-view');
-            correctorView.classList.add('hidden-view');
-            chatView.classList.remove('hidden-view');
-            headerTitle.textContent = "Lua AI Pro - الدردشات";
+            closeSidebar(); editorView.classList.add('hidden-view'); correctorView.classList.add('hidden-view'); chatView.classList.remove('hidden-view'); headerTitle.textContent = "Lua AI Pro - الدردشات";
         };
-
         openEditorNavBtn.onclick = () => {
-            closeSidebar();
-            chatView.classList.add('hidden-view');
-            correctorView.classList.add('hidden-view');
-            editorView.classList.remove('hidden-view');
-            headerTitle.textContent = "Lua AI Pro - محرر كود";
+            closeSidebar(); chatView.classList.add('hidden-view'); correctorView.classList.add('hidden-view'); editorView.classList.remove('hidden-view'); headerTitle.textContent = "Lua AI Pro - محرر كود";
         };
-
         openCorrectorNavBtn.onclick = () => {
-            closeSidebar();
-            chatView.classList.add('hidden-view');
-            editorView.classList.add('hidden-view');
-            correctorView.classList.remove('hidden-view');
-            headerTitle.textContent = "Lua AI Pro - مصحح الكود";
+            closeSidebar(); chatView.classList.add('hidden-view'); editorView.classList.add('hidden-view'); correctorView.classList.remove('hidden-view'); headerTitle.textContent = "Lua AI Pro - مصحح الكود";
         };
 
-        function saveChatsToStorage() {
-            localStorage.setItem('lua_chats_v3', JSON.stringify(chats));
-        }
-
+        // سجل المحادثات
+        function saveChatsToStorage() { localStorage.setItem('lua_chats_v3', JSON.stringify(chats)); }
         function renderChatList() {
             chatListContainer.innerHTML = '';
-            if (chats.length === 0) {
-                chatListContainer.innerHTML = '<span style="font-size:0.82rem; color:#8b949e; text-align:center; padding:10px; display:block;">لا توجد محادثات محفوظة</span>';
-                return;
-            }
+            if (chats.length === 0) { chatListContainer.innerHTML = '<span style="font-size:0.82rem; color:#8b949e; text-align:center; padding:10px; display:block;">لا توجد محادثات</span>'; return; }
             chats.forEach((chat, idx) => {
-                const div = document.createElement('div');
-                div.className = 'chat-item';
-                const formattedTitle = `| ${chat.title.substring(0, 22)}`;
-                div.innerHTML = `
-                    <span>${formattedTitle}</span>
-                    <div class="chat-actions">
-                        <button class="chat-action-btn" onclick="event.stopPropagation(); deleteChat(${idx})" title="حذف">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
-                `;
-                div.onclick = () => {
-                    openChatNavBtn.onclick();
-                };
+                const div = document.createElement('div'); div.className = 'chat-item';
+                div.innerHTML = `<span>| ${chat.title.substring(0, 22)}</span><div class="chat-actions"><button class="chat-action-btn" onclick="event.stopPropagation(); deleteChat(${idx})">🗑️</button></div>`;
+                div.onclick = () => openChatNavBtn.onclick();
                 chatListContainer.appendChild(div);
             });
         }
+        window.deleteChat = function(idx) { chats.splice(idx, 1); saveChatsToStorage(); renderChatList(); }
+        function addChatSession(title) { chats.unshift({ title: title }); if (chats.length > 15) chats.pop(); saveChatsToStorage(); }
 
-        window.deleteChat = function(idx) {
-            chats.splice(idx, 1);
-            saveChatsToStorage();
-            renderChatList();
-        }
-
-        function addChatSession(title) {
-            chats.unshift({ title: title });
-            if (chats.length > 15) chats.pop();
-            saveChatsToStorage();
-        }
-
-        correctorFileDropTrigger.onclick = () => correctorFileInput.click();
-        correctorFileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    correctorCodeInput.value = event.target.result;
-                    correctorFileDropTrigger.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم رفع: ${file.name}`;
-                };
-                reader.readAsText(file);
-            }
-        };
-
-        // محرك الفحص الحقيقي بالذكاء الاصطناعي (مصحح الكود)
-        runRealCorrectorBtn.onclick = async () => {
-            const code = correctorCodeInput.value.trim();
-            if (!code) {
-                correctorOutputBox.innerHTML = '<span style="color:#f85149;">الرجاء كتابة أو لصق كود للفحص والتصحيح.</span>';
-                return;
-            }
-
-            correctorOutputBox.innerHTML = '';
-            userScrolledUpOutput = false;
-            correctorOutputBox.textContent = "جاري الاتصال بمحرك الذكاء الاصطناعي لفحص وتشريح الكود بدقة تامة...\n\n";
-            scrollToBottomOutput();
-
-            try {
-                const promptText = `أنت خبير فحص أخطاء وهندسة برمجيات في Roblox و Luau. قم بتحليل وفحص هذا الكود سطر بستر بدقة تامة، واكشف الأخطاء الإملائية، الثغرات الأمنية، والمشاكل البرمجية، ثم أعطني التقرير مفصلاً يليه الكود المصحح بالكامل:\n\n\`\`\`lua\n${code}\n\`\`\``;
-
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: promptText })
-                });
-                const data = await response.json();
-
-                correctorOutputBox.innerHTML = '';
-
-                if (data.success) {
-                    const resultText = data.reply;
-                    for (let i = 0; i < resultText.length; i++) {
-                        correctorOutputBox.textContent += resultText[i];
-                        scrollToBottomOutput();
-                        await new Promise(r => setTimeout(r, 3));
-                    }
-                } else {
-                    correctorOutputBox.textContent = "خطأ أثناء التحليل: " + (data.error || "تعذر فحص الكود.");
-                }
-            } catch (err) {
-                correctorOutputBox.textContent = "خطأ في الاتصال بالخادم. تأكد من عمل السيرفر.";
-            }
-        };
-
-        userInput.addEventListener('input', () => {
-            const val = userInput.value;
-            if (val.length > 90 || (val.includes('\n') && (val.includes('local') || val.includes('function')))) {
-                if (!currentAttachment) {
-                    createAttachment(val);
-                    userInput.value = '';
-                }
-            }
-        });
-
-        function createAttachment(content) {
-            const sizeInBytes = new Blob([content]).size;
-            const sizeText = sizeInBytes > 1024 ? (sizeInBytes / 1024).toFixed(1) + ' KB' : sizeInBytes + ' B';
-            const firstLine = content.split('\n')[0].substring(0, 22) + '...';
-            currentAttachment = { name: firstLine || 'script.lua', content: content, size: sizeText };
-            renderAttachmentPreview();
-        }
-
-        function renderAttachmentPreview() {
-            if (!currentAttachment) {
-                attachmentContainer.innerHTML = '';
-                return;
-            }
-            attachmentContainer.innerHTML = `
-                <div class="attachment-preview" onclick="openModal()">
-                    <div class="attachment-info">
-                        <div class="attachment-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        </div>
-                        <div class="attachment-details">
-                            <span class="attachment-name">${currentAttachment.name}</span>
-                            <span class="attachment-size">TXT ${currentAttachment.size}</span>
-                        </div>
-                    </div>
-                    <button class="attachment-close" onclick="event.stopPropagation(); removeAttachment()">✕</button>
-                </div>
-            `;
-        }
-
-        function removeAttachment() {
-            currentAttachment = null;
-            attachmentContainer.innerHTML = '';
-        }
-
-        function openModal() {
-            if (!currentAttachment) return;
-            modalTitle.textContent = currentAttachment.name;
-            modalCodeText.textContent = currentAttachment.content;
-            codeModal.style.display = 'flex';
-        }
-        function closeModal() { codeModal.style.display = 'none'; }
-
+        // الدردشة الرئيسية مع الذكاء الاصطناعي
         async function sendMessage() {
-            let messageToSend = '';
-            if (currentAttachment) {
-                messageToSend = `[مرفق كود: ${currentAttachment.name}]\n\`\`\`lua\n${currentAttachment.content}\n\`\`\``;
-                addChatSession(currentAttachment.name);
-                removeAttachment();
-            } else {
-                messageToSend = userInput.value.trim();
-                if (!messageToSend) return;
-                addChatSession(messageToSend);
-                userInput.value = '';
-            }
+            const messageToSend = userInput.value.trim();
+            if (!messageToSend) return;
+            addChatSession(messageToSend);
+            userInput.value = '';
 
-            userScrolledUpChat = false;
-            appendUserMessage(messageToSend);
-            
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user-message';
+            userDiv.textContent = messageToSend;
+            chatContainer.appendChild(userDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
             const loadingId = 'loading-' + Date.now();
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
             msgDiv.id = loadingId;
-            msgDiv.textContent = 'تنفيذ الطلب...';
+            msgDiv.textContent = 'جاري التحليل...';
             chatContainer.appendChild(msgDiv);
-            scrollToBottomChat(true);
-
-            const states = ['تنفيذ الطلب...', 'كتابة السكربت...', 'إنشاء السكربت بدقة...', 'إضافة اللمسة الأخيرة...'];
-            let sIdx = 0;
-            const stateInterval = setInterval(() => {
-                sIdx = (sIdx + 1) % states.length;
-                const el = document.getElementById(loadingId);
-                if (el) el.textContent = states[sIdx];
-            }, 800);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
                 const response = await fetch('/api/chat', {
@@ -870,42 +262,23 @@
                     body: JSON.stringify({ message: messageToSend })
                 });
                 const data = await response.json();
-                clearInterval(stateInterval);
                 document.getElementById(loadingId).remove();
 
                 if (data.success) {
-                    appendAIMessageWithTyping(data.reply);
+                    appendAIMessage(data.reply);
                 } else {
-                    appendErrorMsg('خطأ: ' + (data.error || 'حدث مشكلة في السيرفر'));
+                    appendAIMessage('خطأ: ' + (data.error || 'حدثت مشكلة في السيرفر'), true);
                 }
             } catch (err) {
-                clearInterval(stateInterval);
-                const el = document.getElementById(loadingId);
-                if (el) el.remove();
-                appendErrorMsg('خطأ في الاتصال بالخادم.');
+                document.getElementById(loadingId).remove();
+                appendAIMessage('خطأ في الاتصال بالخادم. تأكد من عمل السيرفر.', true);
             }
         }
 
-        function appendUserMessage(text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message user-message';
-            msgDiv.textContent = text;
-            chatContainer.appendChild(msgDiv);
-            scrollToBottomChat(true);
-        }
-
-        function appendErrorMsg(errorText) {
+        function appendAIMessage(fullContent, isError = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
-            msgDiv.style.color = '#f85149';
-            msgDiv.textContent = errorText;
-            chatContainer.appendChild(msgDiv);
-            scrollToBottomChat(true);
-        }
-
-        async function appendAIMessageWithTyping(fullContent) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message ai-message';
+            if(isError) msgDiv.style.color = '#f85149';
             chatContainer.appendChild(msgDiv);
 
             const parts = fullContent.split(/```lua([\s\S]*?)```/g);
@@ -913,45 +286,80 @@
                 if (i % 2 === 0) {
                     if (parts[i].trim()) {
                         const p = document.createElement('p');
-                        msgDiv.appendChild(p);
                         p.textContent = parts[i].trim();
+                        msgDiv.appendChild(p);
                     }
                 } else {
                     const codeBox = document.createElement('div');
                     codeBox.className = 'code-box';
                     codeBox.innerHTML = `
                         <div class="code-header">
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                نسخ الكود
-                            </button>
+                            <button class="copy-btn" onclick="copyCode(this)">نسخ الكود</button>
                             <span>lua</span>
                         </div>
                         <pre class="code-content"><code>${parts[i].trim()}</code></pre>
                     `;
                     msgDiv.appendChild(codeBox);
                 }
-                scrollToBottomChat();
             }
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         window.copyCode = function(button) {
             const codeText = button.closest('.code-box').querySelector('code').textContent;
             navigator.clipboard.writeText(codeText).then(() => {
-                button.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> تم النسخ!`;
-                setTimeout(() => {
-                    button.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> نسخ الكود`;
-                }, 2000);
+                button.textContent = 'تم النسخ!';
+                setTimeout(() => { button.textContent = 'نسخ الكود'; }, 2000);
             });
         }
 
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         });
+
+        // مصحح الكود المتقدم (رفع الملفات وفحص الأكواد)
+        correctorFileDropTrigger.onclick = () => correctorFileInput.click();
+        correctorFileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    correctorCodeInput.value = event.target.result;
+                    correctorFileDropTrigger.innerHTML = `تم رفع الملف: ${file.name}`;
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        runRealCorrectorBtn.onclick = async () => {
+            const code = correctorCodeInput.value.trim();
+            if (!code) {
+                correctorOutputBox.innerHTML = '<span style="color:#f85149;">الرجاء كتابة أو لصق كود للفحص.</span>';
+                return;
+            }
+
+            correctorOutputBox.textContent = "جاري الفحص الدقيق والاتصال بالذكاء الاصطناعي...\n\n";
+            
+            try {
+                const promptText = `أنت خبير فحص أخطاء وهندسة برمجيات في Roblox و Luau. قم بتحليل وفحص هذا الكود سطر بسطر، واكشف الأخطاء ثم أعطني التقرير يليه الكود المصحح بالكامل:\n\n\`\`\`lua\n${code}\n\`\`\``;
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: promptText })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    correctorOutputBox.textContent = data.reply;
+                } else {
+                    correctorOutputBox.textContent = "خطأ أثناء التحليل: " + (data.error || "تعذر فحص الكود.");
+                }
+            } catch (err) {
+                correctorOutputBox.textContent = "خطأ في الاتصال بالسيرفر. تأكد أن السيرفر يعمل.";
+            }
+        };
     </script>
 </body>
 </html>
