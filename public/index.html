@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua AI Pro</title>
+    <title>Lua AI Pro - Roblox Studio Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: #0b0e14; color: #e6edf3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* الهيدر وقائمة الموديلات */
         header { background-color: #0d1117; padding: 12px 20px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; z-index: 10; position: relative; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         
@@ -19,7 +18,6 @@
         .model-selector-btn { background: #161b22; border: 1px solid #30363d; color: #e6edf3; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
         .model-selector-btn:hover { border-color: #58a6ff; }
         
-        /* أنيميشن سلس لقائمة الموديلات */
         .model-dropdown { position: absolute; top: 55px; left: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 220px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); opacity: 0; transform: translateY(-10px) scale(0.95); pointer-events: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200; overflow: hidden; }
         .model-dropdown.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .model-option { padding: 12px 16px; cursor: pointer; display: flex; flex-direction: column; border-bottom: 1px solid #21262d; transition: background 0.15s; }
@@ -28,33 +26,35 @@
         .model-option-title { font-weight: 700; font-size: 0.9rem; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .model-option-desc { font-size: 0.75rem; color: #8b949e; margin-top: 2px; }
 
-        /* القائمة الجانبية بسلاسة عالية */
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-        .sidebar { position: fixed; top: 0; right: 0; width: 320px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .sidebar { position: fixed; top: 0; right: 0; width: 300px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
         .sidebar.active { transform: translateX(0); }
         .sidebar-header { padding: 16px 20px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #58a6ff; }
         .sidebar-close { background: #21262d; border: none; color: #c9d1d9; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .sidebar-menu { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-item { background: transparent; border: 1px solid transparent; color: #e6edf3; padding: 12px 16px; border-radius: 10px; text-align: right; cursor: pointer; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        .sidebar-item:hover, .sidebar-item.active { background: #161b22; border-color: #30363d; color: #58a6ff; }
 
-        /* منطقة المحادثة */
-        .app-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .app-view { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; }
+        .app-view.active { display: flex; }
+
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
         .message { max-width: 90%; padding: 14px 18px; border-radius: 16px; line-height: 1.6; word-wrap: break-word; font-size: 0.95rem; }
         .user-message { background: #1f6feb; color: #fff; align-self: flex-start; border-bottom-right-radius: 4px; }
         .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; border-bottom-left-radius: 4px; width: 95%; }
 
-        /* صندوق الكود الاحترافي (Code Box) */
         .code-box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; margin: 12px 0; overflow: hidden; }
         .code-header { background: #161b22; padding: 8px 14px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #8b949e; font-family: 'Fira Code', monospace; }
         .copy-btn { background: #21262d; border: 1px solid #30363d; color: #58a6ff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
         .copy-btn:hover { background: #30363d; color: #fff; }
-        .code-box pre { padding: 14px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 0.88rem; color: #e6edf3; line-height: 1.5; direction: ltr; text-align: left; }
+        .code-box pre { padding: 14px; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 0.88rem; color: #e6edf3; line-height: 1.5; direction: ltr; text-align: left; white-space: pre-wrap; word-break: break-word; }
 
-        /* شريط المدخلات البيضاوي مع دعم كروت المرفقات (مثل الصورة) */
         .chat-input-wrapper { padding: 12px 16px; background: transparent; }
         .floating-input-card { background: #161b22; border: 1px solid #30363d; border-radius: 24px; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
 
-        /* حاوية كروت المرفقات المرفوعة (مثل تصميم الآيفون بالصورة) */
         .attachments-chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .attachment-chip { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; position: relative; max-width: 240px; }
         .chip-icon { width: 36px; height: 36px; background: #21262d; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #58a6ff; flex-shrink: 0; overflow: hidden; }
@@ -71,10 +71,23 @@
         #user-input { flex: 1; background: transparent; border: none; outline: none; color: #e6edf3; font-size: 0.95rem; resize: none; height: 26px; max-height: 120px; line-height: 26px; }
         
         .action-btns { display: flex; align-items: center; gap: 6px; }
-        .icon-btn { background: none; border: none; color: #8b949e; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .send-pill-btn { background: #1f6feb; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
         .send-pill-btn:active { transform: scale(0.9); }
         .send-pill-btn svg { fill: #ffffff; width: 18px; height: 18px; }
+
+        /* تصميم مصحح ومحرر الكود */
+        .tool-container { padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .tool-card { background: #161b22; border: 1px solid #30363d; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+        .tool-title { font-size: 1.1rem; font-weight: 700; color: #58a6ff; display: flex; align-items: center; gap: 8px; }
+        .tool-textarea { width: 100%; height: 180px; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; color: #e6edf3; padding: 14px; font-family: 'Fira Code', monospace; font-size: 0.9rem; resize: vertical; line-height: 1.5; direction: ltr; text-align: left; }
+        .tool-textarea:focus { border-color: #58a6ff; outline: none; }
+        
+        /* إشعار التعارض */
+        .conflict-alert { background: #3b2300; border: 1px solid #9e6a03; color: #f0883e; padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; display: none; }
+        .conflict-alert.active { display: flex; }
+
+        .primary-btn { background: #238636; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; align-self: flex-start; }
+        .primary-btn:hover { background: #2ea043; }
     </style>
 </head>
 <body>
@@ -98,7 +111,7 @@
             </div>
             <div class="model-option" data-model="3.6-flash">
                 <div class="model-option-title">3.6 Flash <span class="check-mark">✓</span></div>
-                <div class="model-option-desc">تحليل أكواد Roblox والملفات بذكاء</div>
+                <div class="model-option-desc">بحث ويب وتحليل أكواد Roblox</div>
             </div>
         </div>
     </header>
@@ -106,27 +119,30 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>القائمة الجانبية</span>
+            <span>القائمة الرئيسية</span>
             <button class="sidebar-close" id="sidebarCloseBtn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
+        <div class="sidebar-menu">
+            <button class="sidebar-item active" data-target="chatView">💬 الدردشة الذكية</button>
+            <button class="sidebar-item" data-target="correctorView">🛠️ مصحح الكود (Corrector)</button>
+            <button class="sidebar-item" data-target="editorView">📝 محرر الكود (Editor)</button>
+        </div>
     </div>
 
-    <!-- واجهة الشات -->
-    <div id="chatView" class="app-view">
+    <!-- 1. واجهة الدردشة الذكية -->
+    <div id="chatView" class="app-view active">
         <div id="chat-container">
             <div class="message ai-message">
-                <p>مرحباً بك! يمكنك كتابة الأكواد، أو رفع الملفات والصور مباشرة عبر زر (+) ليتم تحليلها وتصحيحها بداخل صندوق الأكواد[span_2](start_span)[span_2](end_span).</p>
+                <p>أهلاً بك! أنا مساعدك الذكي المتخصص في لغة Lua وتطوير الألعاب في Roblox Studio. يمكنني مساعدتك في كتابة الأكواد، تصحيح الأخطاء، البحث في الويب، وتحليل الملفات والصور.</p>
             </div>
         </div>
 
         <div class="chat-input-wrapper">
-            <!-- input خفي يفتح قائمة خيارات الآيفون الأصلية فوراً (كاميرا / ألبوم / ملفات) -->
             <input type="file" id="nativeFileInput" accept="image/*,.lua,.txt,.json,.js" multiple style="display:none;">
 
             <div class="floating-input-card">
-                <!-- منطقة إظهار كروت الملفات والصور المرفوعة (مثل الصورة) -->
                 <div class="attachments-chips-container" id="attachmentsChipsContainer"></div>
 
                 <div class="input-row">
@@ -134,12 +150,9 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
                     
-                    <textarea id="user-input" placeholder="اكتب سؤالك أو الكود..." rows="1"></textarea>
+                    <textarea id="user-input" placeholder="اكتب سؤالك في Lua أو اطلب شيئاً من روبلوكس..." rows="1"></textarea>
                     
                     <div class="action-btns">
-                        <button class="icon-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        </button>
                         <button class="send-pill-btn" id="sendBtn">
                             <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line><polyline points="5 12 12 5 19 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline></svg>
                         </button>
@@ -149,10 +162,79 @@
         </div>
     </div>
 
+    <!-- 2. واجهة مصحح الكود -->
+    <div id="correctorView" class="app-view">
+        <div class="tool-container">
+            <div class="tool-card">
+                <div class="tool-title">🛠️ مصحح أكواد Lua وفاحص التعارضات</div>
+                <p style="font-size: 0.85rem; color: #8b949e;">قم بلصق الكود أو رفع ملف Lua أدناه لفحص الأخطاء والتعارضات البرمجية تلقائياً.</p>
+                
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="file" id="correctorFileInput" accept=".lua,.txt" style="display:none;">
+                    <button class="primary-btn" onclick="document.getElementById('correctorFileInput').click()" style="background: #21262d; border: 1px solid #30363d;">📁 رفع ملف كود</button>
+                    <span id="correctorFileName" style="font-size: 0.85rem; color: #8b949e;">لم يتم اختيار ملف</span>
+                </div>
+
+                <textarea class="tool-textarea" id="correctorInput" placeholder="-- الصق كود Lua هنا لفحصه وتصحيحه..."></textarea>
+                
+                <div class="conflict-alert" id="conflictAlert">
+                    <span>⚠️ تنبيه تعارض:</span> <span id="conflictText">تم رصد تداخل أو تعارض محتمل في متغيرات السكريبت.</span>
+                </div>
+
+                <button class="primary-btn" id="runCorrectorBtn">فحص وتصحيح الكود</button>
+            </div>
+
+            <div class="tool-card" id="correctorResultCard" style="display:none;">
+                <div class="tool-title">✨ النتيجة والكود المصحح</div>
+                <div id="correctorOutputContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. واجهة محرر الكود -->
+    <div id="editorView" class="app-view">
+        <div class="tool-container">
+            <div class="tool-card">
+                <div class="tool-title">📝 محرر أكواد Lua السريع</div>
+                <p style="font-size: 0.85rem; color: #8b949e;">محرر مخصص لتعديل وتنسيق سكريبتات Roblox Studio مباشرة.</p>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="file" id="editorFileInput" accept=".lua,.txt" style="display:none;">
+                    <button class="primary-btn" onclick="document.getElementById('editorFileInput').click()" style="background: #21262d; border: 1px solid #30363d;">📁 فتح ملف</button>
+                    <button class="primary-btn" id="editorClearBtn" style="background: #da3633;">مسح المحرر</button>
+                </div>
+
+                <textarea class="tool-textarea" id="editorContent" style="height: 350px;" placeholder="-- اكتب أو عدل سكريبت Lua الخاص بك هنا..."></textarea>
+                
+                <button class="primary-btn" id="editorCopyBtn">نسخ الكود بالكامل</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentSelectedModel = '3.6-flash';
-        let attachedFiles = []; // حفظ المرفقات
+        let attachedFiles = [];
 
+        // التنقل بين الواجهات
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        document.getElementById('menuToggleBtn').onclick = () => { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); };
+        document.getElementById('sidebarCloseBtn').onclick = () => { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); };
+        sidebarOverlay.onclick = document.getElementById('sidebarCloseBtn').onclick;
+
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.onclick = () => {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+                
+                item.classList.add('active');
+                document.getElementById(item.getAttribute('data-target')).classList.add('active');
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            };
+        });
+
+        // الدردشة الذكية والملفات المرفقة
         const nativeFileInput = document.getElementById('nativeFileInput');
         const plusBtn = document.getElementById('plusBtn');
         const attachmentsChipsContainer = document.getElementById('attachmentsChipsContainer');
@@ -160,7 +242,6 @@
         const userInput = document.getElementById('user-input');
         const chatContainer = document.getElementById('chat-container');
 
-        // فتح مستعرض الآيفون الأصلي المباشر عند الضغط على (+)
         plusBtn.onclick = () => nativeFileInput.click();
 
         nativeFileInput.onchange = (e) => {
@@ -168,46 +249,35 @@
             files.forEach(file => {
                 const reader = new FileReader();
                 const isImage = file.type.startsWith('image/');
-
                 reader.onload = (evt) => {
-                    const fileObj = {
+                    attachedFiles.push({
                         id: Date.now() + Math.random(),
                         name: file.name,
                         size: (file.size / 1024).toFixed(1) + ' KB',
                         type: file.type,
                         isImage: isImage,
                         data: evt.target.result
-                    };
-                    attachedFiles.push(fileObj);
+                    });
                     renderAttachmentChips();
                 };
-
-                if (isImage) {
-                    reader.readAsDataURL(file);
-                } else {
-                    reader.readAsText(file);
-                }
+                if (isImage) reader.readAsDataURL(file);
+                else reader.readAsText(file);
             });
             nativeFileInput.value = '';
         };
 
-        // رسم كروت المرفقات بداخل حقل الكتابة (مثل الصورة)
         function renderAttachmentChips() {
             attachmentsChipsContainer.innerHTML = '';
             attachedFiles.forEach(file => {
                 const chip = document.createElement('div');
                 chip.className = 'attachment-chip';
-                
-                const iconContent = file.isImage 
-                    ? `<img src="${file.data}">`
-                    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
-
+                const iconContent = file.isImage ? `<img src="${file.data}">` : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path></svg>`;
                 chip.innerHTML = `
                     <button class="chip-remove-btn" onclick="removeAttachment(${file.id})">✕</button>
                     <div class="chip-icon">${iconContent}</div>
                     <div class="chip-details">
                         <span class="chip-name">${file.name}</span>
-                        <span class="chip-meta">${file.isImage ? 'صورة' : 'ملف نصي'} • ${file.size}</span>
+                        <span class="chip-meta">${file.isImage ? 'صورة' : 'ملف'} • ${file.size}</span>
                     </div>
                 `;
                 attachmentsChipsContainer.appendChild(chip);
@@ -219,9 +289,7 @@
             renderAttachmentChips();
         }
 
-        // تنسيق إجابة الذكاء الاصطناعي وإنشاء صناديق الأكواد (Code Box)
         function formatAiResponse(text) {
-            // تحويل الأكواد المحاطة بـ ``` إلى Code Box احترافي
             const codeBlockRegex = /```(?:([a-zA-Z0-9]+)?\n)?([\s\S]*?)```/g;
             return text.replace(codeBlockRegex, (match, lang, code) => {
                 const language = lang || 'lua';
@@ -248,7 +316,6 @@
             setTimeout(() => btn.textContent = 'نسخ الكود', 2000);
         }
 
-        // إرسال الرسالة
         sendBtn.onclick = async () => {
             const text = userInput.value.trim();
             if (!text && attachedFiles.length === 0) return;
@@ -256,36 +323,23 @@
             let compiledMessage = text;
             let imageData = null;
 
-            // بناء المرفقات وتجميع الأكواد من الملفات النصية
             attachedFiles.forEach(f => {
-                if (f.isImage) {
-                    imageData = { data: f.data.split(',')[1], mimeType: f.type };
-                } else {
-                    compiledMessage += `\n\n[محتوى ملف ${f.name}]:\n\`\`\`lua\n${f.data}\n\`\`\``;
-                }
+                if (f.isImage) imageData = { data: f.data.split(',')[1], mimeType: f.type };
+                else compiledMessage += `\n\n[محتوى ملف ${f.name}]:\n\`\`\`lua\n${f.data}\n\`\`\``;
             });
 
-            // إظهار رسالة المستخدم بالواجهة
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'message user-message';
-            if (attachedFiles.length > 0) {
-                let chipsHtml = '<div class="attachments-chips-container" style="margin-bottom:8px;">';
-                attachedFiles.forEach(f => {
-                    chipsHtml += `
-                        <div class="attachment-chip">
-                            <div class="chip-details"><span class="chip-name">${f.name}</span></div>
-                        </div>`;
-                });
-                chipsHtml += '</div>';
-                userMsgDiv.innerHTML = chipsHtml;
-            }
             if (text) userMsgDiv.innerHTML += `<p>${text}</p>`;
             chatContainer.appendChild(userMsgDiv);
 
-            // رسالة الانتظار
+            let loadingText = 'جاري تنفيذ الطلب...';
+            if (attachedFiles.some(f => f.isImage)) loadingText = 'جاري تحليل الصورة...';
+            else if (attachedFiles.some(f => !f.isImage)) loadingText = 'جاري تحليل الملف...';
+
             const aiMsgDiv = document.createElement('div');
             aiMsgDiv.className = 'message ai-message';
-            aiMsgDiv.innerHTML = 'جاري تحليل الأكواد والملفات...';
+            aiMsgDiv.innerHTML = loadingText;
             chatContainer.appendChild(aiMsgDiv);
 
             userInput.value = '';
@@ -299,44 +353,95 @@
                     body: JSON.stringify({
                         message: compiledMessage,
                         model: currentSelectedModel,
-                        image: imageData
+                        image: imageData,
+                        systemInstruction: "أنت مساعد ذكي ومتخصص في لغة Lua وتطوير الألعاب في Roblox Studio."
                     })
                 });
                 const data = await res.json();
-                
-                if (data.success) {
-                    aiMsgDiv.innerHTML = formatAiResponse(data.reply);
-                } else {
-                    aiMsgDiv.textContent = "خطأ: " + data.error;
-                }
+                if (data.success) aiMsgDiv.innerHTML = formatAiResponse(data.reply);
+                else aiMsgDiv.textContent = "خطأ: " + data.error;
             } catch (err) {
                 aiMsgDiv.textContent = "حدث خطأ أثناء الاتصال بالخادم.";
             }
         };
 
-        // التحكم بالنوافذ والقوائم
+        // مصحح الكود منطق العمل
+        const correctorFileInput = document.getElementById('correctorFileInput');
+        correctorFileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('correctorFileName').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = (evt) => document.getElementById('correctorInput').value = evt.target.result;
+            reader.readAsText(file);
+        };
+
+        document.getElementById('runCorrectorBtn').onclick = async () => {
+            const code = document.getElementById('correctorInput').value.trim();
+            if (!code) return alert('الرجاء إدخال أو رفع كود أولاً.');
+
+            const alertBox = document.getElementById('conflictAlert');
+            const resultCard = document.getElementById('correctorResultCard');
+            const outputContainer = document.getElementById('correctorOutputContainer');
+            
+            alertBox.classList.remove('active');
+            outputContainer.innerHTML = 'جاري فحص الكود وكشف التعارضات والأخطاء...';
+            resultCard.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `قم بفحص وتصحيح كود الـ Lua التالي، واكشف عن أي تعارضات (Conflicts) أو أخطاء برمجية:\n\`\`\`lua\n${code}\n\`\`\``,
+                        model: currentSelectedModel
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    outputContainer.innerHTML = formatAiResponse(data.reply);
+                    if (data.reply.includes('تعارض') || data.reply.includes('خطأ') || data.reply.includes('Conflict')) {
+                        alertBox.classList.add('active');
+                        document.getElementById('conflictText').textContent = 'تم رصد تحذيرات أو تعارض محتمل في السكريبت. راجع التوضيح أدناه.';
+                    }
+                } else {
+                    outputContainer.innerHTML = 'حدث خطأ أثناء فحص الكود.';
+                }
+            } catch (err) {
+                outputContainer.innerHTML = 'خطأ في الاتصال بالخادم.';
+            }
+        };
+
+        // محرر الكود منطق العمل
+        const editorFileInput = document.getElementById('editorFileInput');
+        editorFileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => document.getElementById('editorContent').value = evt.target.result;
+            reader.readAsText(file);
+        };
+        document.getElementById('editorClearBtn').onclick = () => document.getElementById('editorContent').value = '';
+        document.getElementById('editorCopyBtn').onclick = () => {
+            const content = document.getElementById('editorContent').value;
+            navigator.clipboard.writeText(content);
+            alert('تم نسخ محتوى المحرر بنجاح!');
+        };
+
+        // اختيار النماذج
         const modelSelectorBtn = document.getElementById('modelSelectorBtn');
         const modelDropdown = document.getElementById('modelDropdown');
-        const menuToggleBtn = document.getElementById('menuToggleBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-
         modelSelectorBtn.onclick = (e) => { e.stopPropagation(); modelDropdown.classList.toggle('active'); };
         document.onclick = () => modelDropdown.classList.remove('active');
 
         document.querySelectorAll('.model-option').forEach(opt => {
             opt.onclick = () => {
                 currentSelectedModel = opt.getAttribute('data-model');
-                document.getElementById('currentModelLabel').textContent = (currentSelectedModel === '3.5-lite') ? '3.5 Flash-Lite' : '3.6 Flash';
+                document.getElementById('currentModelLabel').textContent = currentSelectedModel === '3.5-lite' ? '3.5 Flash-Lite' : '3.6 Flash';
                 document.querySelectorAll('.check-mark').forEach(c => c.textContent = '');
                 opt.querySelector('.check-mark').textContent = '✓';
             };
         });
-
-        menuToggleBtn.onclick = () => { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); };
-        sidebarCloseBtn.onclick = () => { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); };
-        sidebarOverlay.onclick = sidebarCloseBtn.onclick;
     </script>
 </body>
 </html>
