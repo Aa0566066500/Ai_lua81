@@ -97,47 +97,12 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        .ai-message p {
-            margin-bottom: 10px;
-        }
-        .ai-message p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* اقتراحات ذكية */
-        .suggestions-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 16px;
-            padding-top: 14px;
-            border-top: 1px solid #21262d;
-        }
-
-        .suggestion-chip {
-            background-color: #21262d;
-            color: #58a6ff;
-            border: 1px solid #30363d;
-            padding: 6px 14px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .suggestion-chip:hover {
-            background-color: #1f6feb;
-            color: #fff;
-            border-color: #1f6feb;
-            transform: translateY(-2px);
-        }
-
-        /* صندوق الكود الاحترافي */
+        /* صندوق الكود الاحترافي مع زر النسخ في بداية الصندوق */
         .code-box {
             background-color: #0d1117;
             border: 1px solid #30363d;
             border-radius: 12px;
-            margin: 16px 0;
+            margin: 10px 0;
             overflow: hidden;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
         }
@@ -151,20 +116,20 @@
             border-bottom: 1px solid #30363d;
             font-size: 0.82rem;
             color: #8b949e;
-            font-family: monospace;
         }
 
         .copy-btn {
             background: #21262d;
             border: 1px solid #30363d;
             color: #c9d1d9;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
+            font-weight: 600;
             font-family: 'Tajawal', sans-serif;
             transition: all 0.2s;
         }
@@ -265,12 +230,22 @@
 
     <div id="chat-container">
         <div class="message ai-message">
-            <p>أهلاً بك يا بطل! أنا مساعدك الذكي المتخصص في Roblox Studio و Luau. اكتب طلبك وسأقوم بشرح الفكرة وتحليلها بدقة وتجهيز الكود في صندوق احترافي مع زر نسخ.</p>
+            <div class="code-box">
+                <div class="code-header">
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        نسخ الكود
+                    </button>
+                    <span>Luau Script</span>
+                </div>
+                <pre class="code-content"><code>-- أهلاً بك يا بطل! اكتب طلبك وسأكتب لك الكود المطلوب فوراً.
+print("Lua AI Ready!")</code></pre>
+            </div>
         </div>
     </div>
 
     <div id="input-container">
-        <textarea id="user-input" placeholder="اكتب سؤالك أو اطلب نظاماً برمجياً..."></textarea>
+        <textarea id="user-input" placeholder="اكتب طلبك البرمجي هنا..."></textarea>
         <button id="send-btn" title="إرسال">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
         </button>
@@ -281,12 +256,12 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
-        async function sendMessage(textToSend) {
-            const text = textToSend || userInput.value.trim();
+        async function sendMessage() {
+            const text = userInput.value.trim();
             if (!text) return;
 
             appendMessage(text, 'user-message');
-            if (!textToSend) userInput.value = '';
+            userInput.value = '';
             
             const loadingId = appendLoadingMessage();
 
@@ -301,13 +276,13 @@
                 document.getElementById(loadingId).remove();
 
                 if (data.success) {
-                    appendFormattedMessage(data.reply);
+                    appendCodeMessage(data.reply);
                 } else {
-                    appendMessage('خطأ: ' + (data.error || 'حدث مشكلة في السيرفر'), 'ai-message');
+                    appendErrorMsg('خطأ: ' + (data.error || 'حدث مشكلة في السيرفر'));
                 }
             } catch (err) {
                 document.getElementById(loadingId).remove();
-                appendMessage('خطأ في الاتصال بالخادم.', 'ai-message');
+                appendErrorMsg('خطأ في الاتصال بالخادم.');
             }
         }
 
@@ -319,72 +294,48 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        function appendErrorMsg(errorText) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai-message';
+            msgDiv.style.color = '#f85149';
+            msgDiv.textContent = errorText;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
         function appendLoadingMessage() {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message loading';
             msgDiv.id = 'loading-' + Date.now();
-            msgDiv.innerHTML = 'جاري تحليل الطلب وكتابة الكود بدقة <div class="loading-dots"><span></span><span></span><span></span></div>';
+            msgDiv.innerHTML = 'جاري تنفيذ الطلب <div class="loading-dots"><span></span><span></span><span></span></div>';
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return msgDiv.id;
         }
 
-        function appendFormattedMessage(fullContent) {
+        function appendCodeMessage(fullContent) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai-message';
 
-            let mainText = fullContent;
-            let suggestions = [];
+            // تنظيف الكود إذا جاء محاطاً بعلامات الـ markdown
+            let cleanCode = fullContent.replace(/```(?:lua)?([\s\S]*?)```/g, '$1').trim();
 
-            // استخراج المقترحات إن وجدت في النهاية
-            const sugMatch = fullContent.match(/[SUGGESTIONS]([\s\S]*?)(?:$)/);
-            if (sugMatch) {
-                suggestions = sugMatch[1].split('|').map(s => s.trim()).filter(Boolean);
-                mainText = fullContent.replace(sugMatch[0], '').trim();
-            }
-
-            // فصل النص العادي عن الأكواد البرمجية (يدعم ```lua و ```)
-            const parts = mainText.split(/```(?:lua)?([\s\S]*?)```/g);
-
-            for (let i = 0; i < parts.length; i++) {
-                if (i % 2 === 0) {
-                    // النص العادي يكتب بشكل طبيعي ومرتب
-                    if (parts[i].trim()) {
-                        const p = document.createElement('p');
-                        p.textContent = parts[i].trim();
-                        msgDiv.appendChild(p);
-                    }
-                } else {
-                    // الكود البرمجي وحده في صندوق الكود الاحترافي مع زر النسخ في البداية
-                    const codeBox = document.createElement('div');
-                    codeBox.className = 'code-box';
-                    codeBox.innerHTML = `
-                        <div class="code-header">
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                نسخ الكود
-                            </button>
-                            <span>Luau Script</span>
-                        </div>
-                        <pre class="code-content"><code>${parts[i].trim()}</code></pre>
-                    `;
-                    msgDiv.appendChild(codeBox);
-                }
-            }
-
-            // إضافة الاقتراحات الذكية أسفل الرد
-            if (suggestions.length > 0) {
-                const sugContainer = document.createElement('div');
-                sugContainer.className = 'suggestions-container';
-                suggestions.forEach(sug => {
-                    const chip = document.createElement('button');
-                    chip.className = 'suggestion-chip';
-                    chip.textContent = '💡 ' + sug;
-                    chip.onclick = () => sendMessage(sug);
-                    sugContainer.appendChild(chip);
-                });
-                msgDiv.appendChild(sugContainer);
-            }
+            const codeBox = document.createElement('div');
+            codeBox.className = 'code-box';
+            codeBox.innerHTML = `
+                <div class="code-header">
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        نسخ الكود
+                    </button>
+                    <span>Luau Script</span>
+                </div>
+                <pre class="code-content"><code></code></pre>
+            `;
+            
+            // تعبئة الكود بأمان لمنع مشاكل العرض
+            codeBox.querySelector('code').textContent = cleanCode;
+            msgDiv.appendChild(codeBox);
 
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -400,7 +351,7 @@
             });
         }
 
-        sendBtn.addEventListener('click', () => sendMessage());
+        sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
