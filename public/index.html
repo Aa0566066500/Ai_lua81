@@ -3,73 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua AI Pro - Roblox Assistant</title>
+    <title>Lua AI Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
-        body { background-color: #07090f; color: #e6edf3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        button, .chat-item, .file-upload-btn, .sidebar-nav-item { transition: all 0.2s ease; }
+        body { background-color: #0b0e14; color: #e6edf3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        header { background-color: #0d1117; padding: 16px 24px; border-bottom: 1px solid #21262d; font-size: 1.25rem; font-weight: 700; color: #58a6ff; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
-        .header-left { display: flex; align-items: center; gap: 16px; }
+        /* الهيدر وقائمة النماذج */
+        header { background-color: #0d1117; padding: 12px 20px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; z-index: 10; position: relative; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
         .menu-btn { background: none; border: none; cursor: pointer; color: #58a6ff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; }
-        .menu-btn:hover { background: rgba(88, 166, 255, 0.1); }
-        .header-badge { font-size: 0.75rem; background: rgba(88, 166, 255, 0.1); color: #58a6ff; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(88, 166, 255, 0.3); }
 
+        .model-selector-btn { background: #161b22; border: 1px solid #30363d; color: #e6edf3; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .model-selector-btn:hover { border-color: #58a6ff; }
+        
+        .model-dropdown { position: absolute; top: 55px; left: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 220px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 200; overflow: hidden; }
+        .model-dropdown.active { display: flex; }
+        .model-option { padding: 12px 16px; cursor: pointer; display: flex; flex-direction: column; border-bottom: 1px solid #21262d; }
+        .model-option:last-child { border-bottom: none; }
+        .model-option:hover { background: #21262d; }
+        .model-option-title { font-weight: 700; font-size: 0.9rem; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .model-option-desc { font-size: 0.75rem; color: #8b949e; margin-top: 2px; }
+
+        /* القائمة الجانبية */
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 100; display: none; }
         .sidebar-overlay.active { display: block; }
-        .sidebar { position: fixed; top: 0; right: -380px; width: 360px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; display: flex; flex-direction: column; transition: right 0.3s ease; justify-content: space-between; }
+        .sidebar { position: fixed; top: 0; right: -380px; width: 340px; height: 100%; background-color: #0d1117; border-left: 1px solid #30363d; z-index: 101; display: flex; flex-direction: column; transition: right 0.3s ease; justify-content: space-between; }
         .sidebar.active { right: 0; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #58a6ff; }
-        .sidebar-close { background: #21262d; border: none; color: #c9d1d9; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
+        .sidebar-header { padding: 16px 20px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #58a6ff; }
+        .sidebar-close { background: #21262d; border: none; color: #c9d1d9; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .sidebar-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar-section { padding: 20px; border-bottom: 1px solid #21262d; }
-        .sidebar-section h3 { font-size: 0.85rem; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; }
+        .sidebar-section { padding: 16px 20px; border-bottom: 1px solid #21262d; }
+        .sidebar-section h3 { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; text-transform: uppercase; }
+        .chat-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+        .chat-item { background: #161b22; border: 1px solid #30363d; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; cursor: pointer; }
+        .chat-delete-btn { background: none; border: none; color: #8b949e; cursor: pointer; }
+        .sidebar-nav-item { background: #161b22; border: 1px solid #30363d; padding: 10px 14px; border-radius: 10px; color: #58a6ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; }
 
-        .chat-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
-        .chat-item { background: #161b22; border: 1px solid #30363d; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; cursor: pointer; }
-        .chat-item:hover { border-color: #58a6ff; }
-        .chat-item span { color: #e6edf3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 80%; }
-        .chat-delete-btn { background: none; border: none; color: #8b949e; cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
-        .chat-delete-btn:hover { color: #f85149; background: #21262d; }
+        /* منطقة الشات */
+        .app-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+        .message { max-width: 85%; padding: 14px 18px; border-radius: 16px; line-height: 1.6; word-wrap: break-word; font-size: 0.95rem; }
+        .user-message { background: #1f6feb; color: #fff; align-self: flex-start; border-bottom-right-radius: 4px; }
+        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; border-bottom-left-radius: 4px; width: 92%; }
 
-        .sidebar-nav-item { background: #161b22; border: 1px solid #30363d; padding: 12px; border-radius: 10px; color: #58a6ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .sidebar-nav-item:hover { border-color: #58a6ff; background: #1f242c; }
+        /* صندوق إتاحة الميديا داخل الرسائل */
+        .media-preview-box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 8px; margin-bottom: 10px; max-width: 200px; }
+        .media-preview-box img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 6px; display: block; }
+        .media-preview-box .file-tag { font-size: 0.8rem; color: #79c0ff; word-break: break-all; }
 
-        .app-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .hidden-view { display: none !important; }
-
-        #chat-container { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-        .message { max-width: 88%; padding: 18px; border-radius: 16px; line-height: 1.7; word-wrap: break-word; }
-        .user-message { background: #1f6feb; color: #fff; align-self: flex-start; }
-        .ai-message { background: #161b22; border: 1px solid #30363d; color: #e6edf3; align-self: flex-end; width: 95%; }
-
-        .code-box { background-color: #0d1117; border: 1px solid #30363d; border-radius: 10px; margin: 12px 0; overflow: hidden; }
-        .code-header { background-color: #161b22; padding: 8px 14px; display: flex; justify-content: space-between; border-bottom: 1px solid #30363d; font-size: 0.8rem; color: #8b949e; }
-        .copy-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-        .code-content { padding: 14px; overflow-x: auto; font-family: monospace; color: #79c0ff; direction: ltr; text-align: left; white-space: pre-wrap; }
-
-        .editor-workspace { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-        .editor-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media(max-width: 850px) { .editor-container-grid { grid-template-columns: 1fr; } }
+        /* شريط الدردشة البيضاوي العائم (مطابق للصورة) */
+        .chat-input-wrapper { padding: 12px 16px; background: transparent; position: relative; }
         
-        .editor-card { background: #111620; border: 1px solid #30363d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-        .editor-card label { font-size: 0.85rem; color: #8b949e; font-weight: 700; }
-        .editor-card textarea { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #79c0ff; font-family: monospace; padding: 12px; height: 220px; resize: none; outline: none; direction: ltr; text-align: left; }
+        /* معاينة الميديا المرفقة قبل الإرسال */
+        .attachment-preview-bar { display: none; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 8px 12px; margin-bottom: 8px; align-items: center; justify-content: space-between; }
+        .attachment-preview-bar.active { display: flex; }
+        .preview-info { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #79c0ff; }
+        .preview-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+        .remove-attachment-btn { background: none; border: none; color: #f85149; cursor: pointer; }
 
-        .file-upload-btn { background: #1f242c; border: 1px dashed #58a6ff; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; color: #58a6ff; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .file-upload-btn:hover { background: rgba(88, 166, 255, 0.1); }
+        .floating-input-bar { background: #161b22; border: 1px solid #30363d; border-radius: 30px; padding: 6px 10px 6px 6px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .plus-btn { background: none; border: none; color: #e6edf3; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .plus-btn:hover { background: #21262d; }
         
-        .action-main-btn { background: #238636; color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .action-main-btn:hover { background: #2ea043; }
+        #user-input { flex: 1; background: transparent; border: none; outline: none; color: #e6edf3; font-size: 0.95rem; resize: none; height: 24px; max-height: 100px; line-height: 24px; }
+        
+        .input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .icon-btn { background: none; border: none; color: #8b949e; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .send-pill-btn { background: #1f6feb; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .send-pill-btn svg { fill: #ffffff; width: 18px; height: 18px; }
 
-        .large-output-box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 14px; font-family: inherit; font-size: 0.95rem; height: 300px; overflow-y: auto; color: #e6edf3; white-space: pre-wrap; }
-
-        #input-container { background-color: #0d1117; padding: 16px; border-top: 1px solid #21262d; display: flex; gap: 10px; }
-        #user-input { flex: 1; background-color: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 12px; color: #e6edf3; outline: none; resize: none; height: 50px; }
-        #send-btn { background: #238636; border: none; border-radius: 10px; width: 50px; height: 50px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
-        #send-btn svg { fill: #ffffff; width: 20px; height: 20px; }
+        /* قائمة الزر (+) العائمة */
+        .attach-popup-menu { position: absolute; bottom: 70px; right: 20px; background: #161b22; border: 1px solid #30363d; border-radius: 14px; width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 150; overflow: hidden; }
+        .attach-popup-menu.active { display: flex; }
+        .attach-menu-item { padding: 12px 16px; font-size: 0.88rem; color: #e6edf3; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .attach-menu-item:hover { background: #21262d; color: #58a6ff; }
     </style>
 </head>
 <body>
@@ -77,11 +85,25 @@
     <header>
         <div class="header-left">
             <button class="menu-btn" id="menuToggleBtn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <span id="headerTitle">Lua AI Pro - المحادثة</span>
+            
+            <button class="model-selector-btn" id="modelSelectorBtn">
+                <span id="currentModelLabel">3.6 Flash</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
         </div>
-        <span class="header-badge">Roblox Expert</span>
+
+        <div class="model-dropdown" id="modelDropdown">
+            <div class="model-option" data-model="3.5-lite">
+                <div class="model-option-title">3.5 Flash-Lite <span class="check-mark"></span></div>
+                <div class="model-option-desc">أسرع الإجابات للمهام الخفيفة</div>
+            </div>
+            <div class="model-option" data-model="3.6-flash">
+                <div class="model-option-title">3.6 Flash <span class="check-mark">✓</span></div>
+                <div class="model-option-desc">مساعدة متكاملة للأكواد والتحليل</div>
+            </div>
+        </div>
     </header>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -92,258 +114,238 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-
         <div class="sidebar-body">
-            <!-- 1. سجل المحادثات في الأعلى أول خيار -->
             <div class="sidebar-section">
                 <h3>سجل المحادثات</h3>
                 <div class="chat-list" id="chatListContainer"></div>
             </div>
-
-            <!-- 2. الأدوات الرئيسية في الأسفل آخر شيء -->
             <div class="sidebar-section">
                 <h3>الأدوات الرئيسية</h3>
                 <div class="sidebar-nav-item" id="newChatNavBtn" style="color: #3fb950;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     محادثة جديدة
                 </div>
-                <div class="sidebar-nav-item" id="openEditorNavBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                    محرر كود
-                </div>
-                <div class="sidebar-nav-item" id="openCorrectorNavBtn" style="color: #f85149;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    مصحح الكود
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- قسم المحادثة -->
+    <!-- واجهة الدردشة الرئيسية -->
     <div id="chatView" class="app-view">
         <div id="chat-container">
             <div class="message ai-message">
-                <p>مرحباً بك! أنا مساعدك الذكي لتطوير وفحص أكواد Roblox Luau. اكتب سؤالك لبدء المحادثة.</p>
+                <p>مرحباً بك! أنا مساعدك الذكي لبرمجة وتحليل ألعاب Roblox. أرسل استفسارك، أو كودك، أو صورة للتحليل.</p>
             </div>
         </div>
-        <div id="input-container">
-            <textarea id="user-input" placeholder="اكتب سؤالك أو الكود هنا..."></textarea>
-            <button id="send-btn">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-            </button>
-        </div>
-    </div>
 
-    <!-- قسم محرر الكود -->
-    <div id="editorView" class="app-view hidden-view">
-        <div class="editor-workspace">
-            <div class="editor-card" style="flex: 1;">
-                <label>محرر الأكواد البرمجية (Luau)</label>
-                <textarea id="mainCodeEditorArea" style="height: 350px;" placeholder="اكتب أو الصق الكود هنا للتعديل عليه..."></textarea>
-            </div>
-        </div>
-    </div>
-
-    <!-- قسم مصحح الكود ورفع الملفات -->
-    <div id="correctorView" class="app-view hidden-view">
-        <div class="editor-workspace">
-            <div class="editor-container-grid">
-                <div class="editor-card">
-                    <label>ادخل الكود أو ارفع ملف (.lua / .txt)</label>
-                    
-                    <input type="file" id="luaFileInput" style="display: none;" accept=".lua,.txt">
-                    <div class="file-upload-btn" id="triggerFileUpload">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        اختر ملف من جهازك
-                    </div>
-
-                    <textarea id="correctorCodeInput" placeholder="أو الصق كود Luau مباشرة هنا..."></textarea>
-                    <button class="action-main-btn" id="runRealCorrectorBtn">بدء الفحص والتصحيح</button>
+        <div class="chat-input-wrapper">
+            <!-- قائمة الخيارات عند الضغط على (+) -->
+            <div class="attach-popup-menu" id="attachPopupMenu">
+                <div class="attach-menu-item" id="optCamera">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    الكاميرا
                 </div>
-                <div class="editor-card">
-                    <label>نتيجة التحليل والتصحيح</label>
-                    <div class="large-output-box" id="correctorOutputBox">في انتظار إدخال الكود...</div>
+                <div class="attach-menu-item" id="optPhotos">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    ألبوم الصور
+                </div>
+                <div class="attach-menu-item" id="optFiles">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                    الملفات
+                </div>
+            </div>
+
+            <!-- مدخلات الملفات الخفية -->
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="photoInput" accept="image/*" style="display:none;">
+            <input type="file" id="fileInput" accept=".lua,.txt,.json,.js" style="display:none;">
+
+            <!-- بار معاينة الصورة/الملف المرفق قبل الإرسال -->
+            <div class="attachment-preview-bar" id="attachmentPreviewBar">
+                <div class="preview-info" id="previewInfo"></div>
+                <button class="remove-attachment-btn" id="removeAttachmentBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- شريط الكتابة البيضاوي الاحترافي -->
+            <div class="floating-input-bar">
+                <button class="plus-btn" id="plusMenuToggle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                
+                <textarea id="user-input" placeholder="اكتب رسالتك..." rows="1"></textarea>
+                
+                <div class="input-actions">
+                    <button class="icon-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                    <button class="send-pill-btn" id="sendBtn">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line><polyline points="5 12 12 5 19 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline></svg>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const menuToggleBtn = document.getElementById('menuToggleBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+        let currentSelectedModel = '3.6-flash';
+        let attachedImageBase64 = null;
+        let attachedImageMime = null;
+        let attachedFileName = null;
 
-        const newChatNavBtn = document.getElementById('newChatNavBtn');
-        const openEditorNavBtn = document.getElementById('openEditorNavBtn');
-        const openCorrectorNavBtn = document.getElementById('openCorrectorNavBtn');
-        const headerTitle = document.getElementById('headerTitle');
+        const modelSelectorBtn = document.getElementById('modelSelectorBtn');
+        const modelDropdown = document.getElementById('modelDropdown');
+        const currentModelLabel = document.getElementById('currentModelLabel');
 
-        const chatView = document.getElementById('chatView');
-        const editorView = document.getElementById('editorView');
-        const correctorView = document.getElementById('correctorView');
+        const plusMenuToggle = document.getElementById('plusMenuToggle');
+        const attachPopupMenu = document.getElementById('attachPopupMenu');
 
-        const chatContainer = document.getElementById('chat-container');
+        const cameraInput = document.getElementById('cameraInput');
+        const photoInput = document.getElementById('photoInput');
+        const fileInput = document.getElementById('fileInput');
+
+        const attachmentPreviewBar = document.getElementById('attachmentPreviewBar');
+        const previewInfo = document.getElementById('previewInfo');
+        const removeAttachmentBtn = document.getElementById('removeAttachmentBtn');
+
+        const sendBtn = document.getElementById('sendBtn');
         const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const chatListContainer = document.getElementById('chatListContainer');
+        const chatContainer = document.getElementById('chat-container');
 
-        const correctorCodeInput = document.getElementById('correctorCodeInput');
-        const runRealCorrectorBtn = document.getElementById('runRealCorrectorBtn');
-        const correctorOutputBox = document.getElementById('correctorOutputBox');
-        
-        const luaFileInput = document.getElementById('luaFileInput');
-        const triggerFileUpload = document.getElementById('triggerFileUpload');
+        // التبديل بين النماذج (3.5 و 3.6)
+        modelSelectorBtn.onclick = (e) => { e.stopPropagation(); modelDropdown.classList.toggle('active'); };
+        document.onclick = () => { modelDropdown.classList.remove('active'); attachPopupMenu.classList.remove('active'); };
 
-        let chats = JSON.parse(localStorage.getItem('lua_chats_v4') || '[]');
-        let isCurrentChatSaved = false;
+        document.querySelectorAll('.model-option').forEach(opt => {
+            opt.onclick = () => {
+                currentSelectedModel = opt.getAttribute('data-model');
+                currentModelLabel.textContent = (currentSelectedModel === '3.5-lite') ? '3.5 Flash-Lite' : '3.6 Flash';
+                
+                document.querySelectorAll('.check-mark').forEach(c => c.textContent = '');
+                opt.querySelector('.check-mark').textContent = '✓';
+            };
+        });
 
-        menuToggleBtn.onclick = () => { renderChatList(); sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); };
-        function closeSidebar() { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); }
-        sidebarCloseBtn.onclick = closeSidebar; sidebarOverlay.onclick = closeSidebar;
+        // فتح قائمة (+) المرفقات
+        plusMenuToggle.onclick = (e) => { e.stopPropagation(); attachPopupMenu.classList.toggle('active'); };
 
-        // تنقل الصفحات
-        newChatNavBtn.onclick = () => {
-            closeSidebar();
-            editorView.classList.add('hidden-view'); 
-            correctorView.classList.add('hidden-view'); 
-            chatView.classList.remove('hidden-view'); 
-            headerTitle.textContent = "Lua AI Pro - المحادثة";
-            
-            // إنشاء واجهة محادثة جديدة بدون حفظها بالسجل حتى إرسال أول رسالة
-            chatContainer.innerHTML = `
-                <div class="message ai-message">
-                    <p>مرحباً بك! أنا مساعدك الذكي لتطوير وفحص أكواد Roblox Luau. اكتب سؤالك لبدء المحادثة.</p>
-                </div>
-            `;
-            isCurrentChatSaved = false;
-        };
+        document.getElementById('optCamera').onclick = () => cameraInput.click();
+        document.getElementById('optPhotos').onclick = () => photoInput.click();
+        document.getElementById('optFiles').onclick = () => fileInput.click();
 
-        openEditorNavBtn.onclick = () => {
-            closeSidebar(); 
-            chatView.classList.add('hidden-view'); 
-            correctorView.classList.add('hidden-view'); 
-            editorView.classList.remove('hidden-view'); 
-            headerTitle.textContent = "Lua AI Pro - محرر كود";
-        };
+        // قراءة وتجهيز الصور
+        function handleImageSelection(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                attachedImageBase64 = e.target.result.split(',')[1];
+                attachedImageMime = file.type;
+                attachedFileName = file.name;
 
-        openCorrectorNavBtn.onclick = () => {
-            closeSidebar(); 
-            chatView.classList.add('hidden-view'); 
-            editorView.classList.add('hidden-view'); 
-            correctorView.classList.remove('hidden-view'); 
-            headerTitle.textContent = "Lua AI Pro - مصحح الكود";
-        };
-
-        // عرض سجل المحادثات
-        function renderChatList() {
-            chatListContainer.innerHTML = '';
-            if (chats.length === 0) {
-                chatListContainer.innerHTML = '<span style="font-size:0.82rem; color:#8b949e; text-align:center; padding:10px; display:block;">لا توجد محادثات</span>';
-                return;
-            }
-            chats.forEach((chat, idx) => {
-                const div = document.createElement('div');
-                div.className = 'chat-item';
-                div.innerHTML = `
-                    <span>${chat.title}</span>
-                    <button class="chat-delete-btn" onclick="event.stopPropagation(); deleteChat(${idx})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
+                previewInfo.innerHTML = `
+                    <img src="${e.target.result}" class="preview-thumb">
+                    <span>${file.name}</span>
                 `;
-                chatListContainer.appendChild(div);
-            });
+                attachmentPreviewBar.classList.add('active');
+            };
+            reader.readAsDataURL(file);
         }
 
-        window.deleteChat = function(idx) {
-            chats.splice(idx, 1);
-            localStorage.setItem('lua_chats_v4', JSON.stringify(chats));
-            renderChatList();
-        };
+        cameraInput.onchange = (e) => handleImageSelection(e.target.files[0]);
+        photoInput.onchange = (e) => handleImageSelection(e.target.files[0]);
 
-        // رفع الملفات
-        triggerFileUpload.onclick = () => luaFileInput.click();
-        luaFileInput.onchange = (e) => {
+        // قراءة الملفات النصية البرمجية
+        fileInput.onchange = (e) => {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    correctorCodeInput.value = event.target.result;
-                    triggerFileUpload.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        تم رفع: ${file.name}
-                    `;
-                };
-                reader.readAsText(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                userInput.value += `\n[محتوى ملف ${file.name}]:\n` + evt.target.result;
+                previewInfo.innerHTML = `<span>تم إرفاق الملف: ${file.name}</span>`;
+                attachmentPreviewBar.classList.add('active');
+            };
+            reader.readAsText(file);
         };
 
-        // فحص وتصحيح الكود
-        runRealCorrectorBtn.onclick = async () => {
-            const code = correctorCodeInput.value.trim();
-            if (!code) {
-                correctorOutputBox.innerHTML = '<span style="color:#f85149;">الرجاء كتابة كود أو رفع ملف أولاً!</span>';
-                return;
-            }
-
-            correctorOutputBox.textContent = "جاري فحص الكود والتحقق منه...";
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: "قم بتصحيح وفحص السكربت التالي بدقة:\n\n" + code })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    correctorOutputBox.textContent = data.reply;
-                } else {
-                    correctorOutputBox.textContent = "خطأ: " + data.error;
-                }
-            } catch (err) {
-                correctorOutputBox.textContent = "تعذر الاتصال بالسيرفر. تأكد من تشغيله في Render.";
-            }
+        removeAttachmentBtn.onclick = () => {
+            attachedImageBase64 = null;
+            attachedImageMime = null;
+            attachedFileName = null;
+            attachmentPreviewBar.classList.remove('active');
         };
 
-        // إرسال رسالة المحادثة
+        // إرسال الرسالة
         sendBtn.onclick = async () => {
-            const msg = userInput.value.trim();
-            if(!msg) return;
+            const text = userInput.value.trim();
+            if (!text && !attachedImageBase64) return;
 
-            // عدم حفظ المحادثة في السجل إلا بعد كتابة أول رسالة وتسميتها بها
-            if (!isCurrentChatSaved) {
-                isCurrentChatSaved = true;
-                const chatTitle = msg.length > 25 ? msg.substring(0, 25) + "..." : msg;
-                chats.unshift({ id: Date.now(), title: chatTitle });
-                localStorage.setItem('lua_chats_v4', JSON.stringify(chats));
+            // بناء رسالة المستخدم بالواجهة
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user-message';
+            
+            if (attachedImageBase64) {
+                userMsgDiv.innerHTML += `
+                    <div class="media-preview-box">
+                        <img src="data:${attachedImageMime};base64,${attachedImageBase64}">
+                    </div>
+                `;
             }
+            if (text) {
+                userMsgDiv.innerHTML += `<p>${text}</p>`;
+            }
+            chatContainer.appendChild(userMsgDiv);
 
-            const userDiv = document.createElement('div');
-            userDiv.className = 'message user-message';
-            userDiv.textContent = msg;
-            chatContainer.appendChild(userDiv);
+            // تحديد رسالة الانتظار بحسب المحتوى
+            const aiMsgDiv = document.createElement('div');
+            aiMsgDiv.className = 'message ai-message';
+            
+            if (attachedImageBase64) {
+                aiMsgDiv.textContent = "جاري تحليل الصورة بالذكاء الاصطناعي...";
+            } else if (text.includes("[محتوى ملف")) {
+                aiMsgDiv.textContent = "جاري تحليل الملف الأكواد البرمجية...";
+            } else {
+                aiMsgDiv.textContent = "جاري المعالجة والتحليل...";
+            }
+            chatContainer.appendChild(aiMsgDiv);
+
+            // تجهيز البيانات للإرسال
+            const payload = {
+                message: text,
+                model: currentSelectedModel,
+                image: attachedImageBase64 ? { data: attachedImageBase64, mimeType: attachedImageMime } : null
+            };
+
+            // تفريغ المدخلات
             userInput.value = '';
+            removeAttachmentBtn.click();
 
             try {
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: msg })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'message ai-message';
-                aiDiv.textContent = data.success ? data.reply : ('خطأ: ' + data.error);
-                chatContainer.appendChild(aiDiv);
-            } catch(e) {
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'message ai-message';
-                aiDiv.style.color = '#f85149';
-                aiDiv.textContent = 'فشل الاتصال بالسيرفر.';
-                chatContainer.appendChild(aiDiv);
+                
+                if (data.success) {
+                    aiMsgDiv.textContent = data.reply;
+                } else {
+                    aiMsgDiv.textContent = "خطأ: " + data.error;
+                }
+            } catch (err) {
+                aiMsgDiv.textContent = "حدث خطأ أثناء الاتصال بالسيرفر.";
             }
         };
+
+        // تحكم القائمة الجانبية
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+        menuToggleBtn.onclick = () => { sidebar.classList.add('active'); sidebarOverlay.classList.add('active'); };
+        sidebarCloseBtn.onclick = () => { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); };
+        sidebarOverlay.onclick = sidebarCloseBtn.onclick;
     </script>
 </body>
 </html>
