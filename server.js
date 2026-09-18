@@ -12,10 +12,8 @@ app.post('/api/chat', async (req, res) => {
     try {
         const { message, model, image, systemInstruction } = req.body;
         
-        // استخدام الموديلات الحديثة فقط وتجنب النماذج القديمة
-        let modelsToTry = model === '3.5-lite' 
-            ? ['gemini-3.5-flash-lite', 'gemini-3.6-flash'] 
-            : ['gemini-3.6-flash', 'gemini-3.5-flash'];
+        // قائمة الموديلات الحديثة للتبديل التلقائي في حال الضغط أو الاستنفاد
+        let modelsToTry = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 
         let responseText = null;
         let lastError = null;
@@ -45,7 +43,9 @@ app.post('/api/chat', async (req, res) => {
             }
         }
 
-        if (!responseText) throw lastError || new Error("عذراً، حدث خطأ أثناء المعالجة.");
+        if (!responseText) {
+            throw new Error(lastError?.message || "عذراً، تم استنفاد الحد المسموح مؤقتاً (Quota Exceeded)، يرجى المحاولة بعد قليل.");
+        }
         res.json({ success: true, reply: responseText });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
